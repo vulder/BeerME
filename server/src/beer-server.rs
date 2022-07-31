@@ -7,7 +7,11 @@ use std::{env, io};
 use actix_web::{middleware, App, HttpServer};
 
 mod beerer;
+mod beer_tracker;
 mod constants;
+
+pub const SERVER_IP: &str = "127.0.0.1";
+pub const SERVER_PORT: &str = "8090";
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -19,8 +23,9 @@ async fn main() -> io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(beerer::beer)
             .service(beerer::create)
+            .service(beer_tracker::take_beer)
     })
-    .bind("0.0.0.0:8080")?
+    .bind(SERVER_IP.to_owned() + ":" + SERVER_PORT)?
     .run()
     .await
 }
