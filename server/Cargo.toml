@@ -3,6 +3,10 @@ name = "beer-server"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "beer-server"
+path = "src/beer-server.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
