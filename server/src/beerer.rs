@@ -33,7 +33,7 @@ pub struct RequestData {
 impl RequestData {
     pub fn to_beer(&self) -> Option<Beer> {
         match &self.message {
-            Some(message) => Some(Beer::new(message.to_string())),
+            Some(msg) => Some(Beer::new(msg.to_string())),
             None => None,
         }
     }

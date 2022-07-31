@@ -7,8 +7,11 @@ use std::{env, io};
 use actix_web::{middleware, App, HttpServer};
 
 mod beerer;
-mod beer_tracker;
+mod beer_controller;
 mod constants;
+mod dtos;
+mod daos;
+mod rfid_service;
 
 pub const SERVER_IP: &str = "127.0.0.1";
 pub const SERVER_PORT: &str = "8090";
@@ -23,7 +26,7 @@ async fn main() -> io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(beerer::beer)
             .service(beerer::create)
-            .service(beer_tracker::take_beer)
+            .service(beer_controller::take_beer)
     })
     .bind(SERVER_IP.to_owned() + ":" + SERVER_PORT)?
     .run()
