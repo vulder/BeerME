@@ -17,6 +17,7 @@ async fn main() -> io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .service(beerer::beer)
+            .service(beerer::create)
     })
     .bind("0.0.0.0:8080")?
     .run()
