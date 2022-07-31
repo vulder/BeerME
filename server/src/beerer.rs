@@ -33,10 +33,6 @@ pub struct RequestData {
 impl RequestData {
     pub fn to_beer(&self) -> Option<Beer> {
         match &self.message {
-            Some(message) => println!("Here {}", message),
-            None => println!("nope"),
-        }
-        match &self.message {
             Some(message) => Some(Beer::new(message.to_string())),
             None => None,
         }
@@ -45,10 +41,9 @@ impl RequestData {
 
 #[post("/send_beer")]
 pub async fn create(req: Json<RequestData>) -> HttpResponse {
-    println!("Raw {}", req.message.clone().unwrap_or("empty".to_string()));
-    println!("Got {}", req.to_beer().map(|x| {
+    log::debug!("Got beer request {:?}", req.to_beer().map(|x| {
         x.message
-    }).unwrap_or("nothing".to_string()));
+    }));
     HttpResponse::Ok()
         .content_type(APPLICATION_JSON)
         .json(req.to_beer())

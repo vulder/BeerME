@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate actix_web;
+extern crate log;
 
 use std::{env, io};
 
@@ -10,7 +11,7 @@ mod constants;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    env::set_var("RUST_LOG", "actix_web=debug,actix_server=info");
+    env::set_var("RUST_LOG", "actix_web=debug,actix_server=info,beer_server=debug");
     env_logger::init();
 
     HttpServer::new(|| {
