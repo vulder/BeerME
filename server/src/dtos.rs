@@ -44,7 +44,7 @@ impl CreateUserRequest {
                 first_name.to_string(),
                 last_name.to_string(),
                 email.to_string(),
-                token.to_string(),
+                UserToken::sanitize(token.to_string()),
             ))
         } else {
             None
