@@ -1,4 +1,4 @@
-use actix_web::web::{Json, Data};
+use actix_web::web::{Json, Data, Path};
 use actix_web::{HttpResponse, Error};
 use serde::{Deserialize, Serialize};
 
@@ -7,6 +7,7 @@ use crate::constants::APPLICATION_JSON;
 
 use crate::dtos::{CreateUserRequest, UserRequest};
 
+use crate::daos::UserToken;
 use crate::errors::MyError;
 use crate::user_service;
 use crate::rfid_service;
@@ -30,8 +31,23 @@ pub async fn create_user(create_user_req: Json<CreateUserRequest>, db_pool: Data
     }
 }
 
-#[get("/user_info/{id}")]
-pub async fn user_info(user_req: Json<UserRequest>, db_pool: Data<Pool>) -> HttpResponse {
+#[get("/tokens/{token_id}/user")]
+pub async fn user_info(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
+    let maybe_user_token = UserToken::parse_from_string(path.into_inner());
 
-    HttpResponse::NotFound().finish()
+    match &maybe_user_token {
+        Some(user_token) => {
+            let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+            println!("Form Path {:?}", user_token);
+
+            let user = user_service::get_user(&client, &user_token).await;
+            if let Some(user) = user {
+                Ok(HttpResponse::Ok().json(user))
+            } else {
+                Ok(HttpResponse::NotFound().reason("Token was not registered").finish())
+            }
+
+        },
+        None => Ok(HttpResponse::BadRequest().reason("Token id was wrongly formatted").finish()),
+    }
 }

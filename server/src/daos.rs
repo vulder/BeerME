@@ -3,13 +3,22 @@ use serde::{Deserialize, Serialize};
 use tokio_pg_mapper_derive::PostgresMapper;
 use tokio_pg_mapper::FromTokioPostgresRow;
 
+#[derive(Debug)]
 pub struct UserToken {
     pub id: String,
 }
 
 impl UserToken {
     pub fn new(id: String) -> Self {
-        Self { id }
+        Self { id: UserToken::sanitize(id) }
+    }
+
+    pub fn parse_from_string(raw_string: String) -> Option<UserToken> {
+        Some(UserToken::new(raw_string))
+    }
+
+    pub fn sanitize(raw_token: String) -> String {
+        raw_token.chars().filter(|c| !c.is_whitespace()).map(|c| c.to_uppercase().to_string()).collect()
     }
 }
 
@@ -19,7 +28,7 @@ impl fmt::Display for UserToken {
     }
 }
 
-#[derive(Deserialize, PostgresMapper, Serialize, Debug)]
+#[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "users")]
 pub struct User {
     pub first_name: String,

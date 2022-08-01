@@ -56,6 +56,7 @@ async fn main() -> io::Result<()> {
             .service(beerer::create)
             .service(beer_controller::take_beer)
             .service(app_controller::create_user)
+            .service(app_controller::user_info)
     })
     .bind(SERVER_IP.to_owned() + ":" + SERVER_PORT)?
     .run()
