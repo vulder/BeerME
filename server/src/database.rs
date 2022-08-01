@@ -1,5 +1,5 @@
 use deadpool_postgres::Client;
-use crate::daos::{User, BeerEntry};
+use crate::daos::{User, BeerEntry, UserBeerCount};
 use tokio_pg_mapper::FromTokioPostgresRow;
 use crate::errors::MyError;
 
@@ -58,5 +58,54 @@ pub async fn register_taken_beer(client: &Client, beer_entry: BeerEntry) -> Resu
         .map(|row| BeerEntry::from_row_ref(row).unwrap())
         .collect::<Vec<BeerEntry>>()
         .pop()
+        .ok_or(MyError::NotFound)
+}
+
+pub async fn beer_entries_for_user(client: &Client, user: &User) -> Result<Vec<BeerEntry>, MyError> {
+    let _stmt = include_str!("sql/get_beer_entries_for_user.sql");
+    let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    let op_users = client.query(&stmt, &[
+                                &user.uuid,
+    ])
+        .await?
+        .iter()
+        .map(|row| BeerEntry::from_row_ref(row).unwrap())
+        .collect::<Vec<BeerEntry>>();
+
+    Ok(op_users)
+}
+
+pub async fn beer_summary_values_for_user(client: &Client, user: &User) -> Result<UserBeerCount, MyError> {
+    let _stmt = include_str!("sql/get_beer_user_summary.sql");
+    // let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client.query(
+        &stmt,
+        &[
+            &user.uuid,
+        ],
+        ).await?
+        .iter()
+        .map(|row| UserBeerCount::from_row_ref(row).unwrap())
+        .collect::<Vec<UserBeerCount>>()
+        .pop()
+        .ok_or(MyError::NotFound)
+}
+
+pub async fn favorite_beer_for_user(client: &Client, user: &User) -> Result<String, MyError> {
+    let _stmt = include_str!("sql/favorit_beer.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client.query(
+        &stmt,
+        &[
+            &user.uuid,
+        ],
+        ).await?
+        .pop()
+        .map(|x| x.get(0))
         .ok_or(MyError::NotFound)
 }

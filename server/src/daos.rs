@@ -84,3 +84,14 @@ impl fmt::Display for BeerEntry {
         writeln!(f, "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}", self.uuid, self.time.format("%Y-%m-%d %H:%M:%S").to_string(), self.bier_brand)
     }
 }
+
+
+
+#[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
+#[pg_mapper(table = "beers")]
+pub struct UserBeerCount {
+    pub total: i64,
+    pub today: i64,
+    pub week: i64,
+    pub month: i64,
+}

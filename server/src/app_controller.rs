@@ -12,7 +12,7 @@ use crate::errors::MyError;
 use crate::user_service;
 use crate::rfid_service;
 
-#[post("/create_user")]
+#[post("/users")]
 pub async fn create_user(create_user_req: Json<CreateUserRequest>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
 
     let maybe_user = create_user_req.to_user();
@@ -38,7 +38,6 @@ pub async fn user_info(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpRe
     match &maybe_user_token {
         Some(user_token) => {
             let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-            println!("Form Path {:?}", user_token);
 
             let user = user_service::get_user(&client, &user_token).await;
             if let Some(user) = user {
@@ -49,5 +48,21 @@ pub async fn user_info(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpRe
 
         },
         None => Ok(HttpResponse::BadRequest().reason("Token id was wrongly formatted").finish()),
+    }
+}
+
+#[get("/users/{user_id}/beers/summary")]
+pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
+    println!("{}", path);
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user_uuid = path.into_inner();
+    let maybe_user = user_service::get_user_from_uuid(&client, user_uuid).await;
+
+    match &maybe_user {
+        Some(user) => {
+            let beer_summary = rfid_service::calculate_beer_summary(&client, user).await;
+            Ok(HttpResponse::Ok().content_type(APPLICATION_JSON).json(beer_summary))
+        },
+        None => Ok(HttpResponse::NotFound().reason("User was not registered in the system").finish()),
     }
 }
