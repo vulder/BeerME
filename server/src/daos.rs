@@ -2,6 +2,7 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use tokio_pg_mapper_derive::PostgresMapper;
 use tokio_pg_mapper::FromTokioPostgresRow;
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct UserToken {
@@ -31,6 +32,7 @@ impl fmt::Display for UserToken {
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "users")]
 pub struct User {
+    pub uuid: String,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
@@ -38,8 +40,9 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(first_name: String, last_name: String, email: String, token: String) -> Self {
+    pub fn new(uuid: Uuid, first_name: String, last_name: String, email: String, token: String) -> Self {
         Self {
+            uuid: uuid.to_string(),
             first_name,
             last_name,
             email,
@@ -54,7 +57,7 @@ impl User {
 
 impl fmt::Display for User {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "User{{ first_name: {} }}", self.first_name)
+        writeln!(f, "User{{ uuid: {}, first_name: {} }}", self.uuid, self.first_name)
     }
 }
 

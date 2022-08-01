@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use uuid::Uuid;
 use crate::daos::{User, UserToken};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -39,6 +40,7 @@ impl CreateUserRequest {
             self.token.as_ref(),
         ) {
             Some(User::new(
+                Uuid::new_v4(),
                 first_name.to_string(),
                 last_name.to_string(),
                 email.to_string(),

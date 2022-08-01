@@ -27,6 +27,7 @@ pub async fn create_user(client: &Client, user: &User) -> Result<User, MyError> 
     client.query(
         &stmt,
         &[
+            &user.uuid,
             &user.first_name,
             &user.last_name,
             &user.email,
