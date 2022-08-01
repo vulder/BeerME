@@ -1,82 +1,151 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-import 'package:ndef/ndef.dart' as ndef;
+import 'package:http/http.dart' as http;
+import 'package:app/dto/user.dart';
 
-class Register extends StatefulWidget {
-  @override
-  _RegisterState createState() => _RegisterState();
-}
+class Register extends StatelessWidget {
+  static var registrationWidget = (String tokenId) {
+    return Column();
+  };
 
-class _RegisterState extends State<Register> {
-  int _counter = 0;
+  static var sanitize = (String token) {
+    return token.replaceAll(RegExp(r'/^[A-Fa-f0-9]/'), "");
+  };
+  static var retrieveUserWidget = (String tokenId) {
+    return FutureBuilder(
+        future: http.get(Uri.http(
+            "192.168.1.177:8080", "/tokens/${sanitize(tokenId)}/user")),
+        builder: (BuildContext context,
+            AsyncSnapshot<http.Response> retrieveUserSnapshot) {
+          if (retrieveUserSnapshot.hasData) {
+            if (retrieveUserSnapshot.data?.statusCode == 404) {
+              return registrationWidget(tokenId);
+            } else if (retrieveUserSnapshot.data?.statusCode == 200) {
+              var user = UserDto.fromJson(
+                  json.decode('${retrieveUserSnapshot.data?.body}'));
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+              return Column(children: [
+                const Icon(
+                  Icons.check,
+                  color: Colors.green,
+                  size: 60,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text('Hello ${user.first_name} ${user.last_name}'),
+                )
+              ]);
+            } else {
+              return Column(children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 60,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                      'User data retrieval API request failed due to unknown reason. Return code is ${retrieveUserSnapshot.data?.statusCode} and body content ${retrieveUserSnapshot.data?.body}'),
+                )
+              ]);
+            }
+          } else if (retrieveUserSnapshot.hasError) {
+            return Column(children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                    'User data retrieval failed. Error: ${retrieveUserSnapshot.error}'),
+              )
+            ]);
+          } else {
+            return Column(children: const [
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: CircularProgressIndicator(),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text('Retrieving user data ...'),
+              )
+            ]);
+          }
+
+          return Text(retrieveUserSnapshot.data.toString());
+        });
+  };
+
+  static FutureBuilder<NFCTag> readTagWidget = FutureBuilder<NFCTag>(
+      future: FlutterNfcKit.poll(),
+      builder: (BuildContext context, AsyncSnapshot<NFCTag> snapshot) {
+        if (snapshot.hasData) {
+          return retrieveUser('${snapshot.data?.id}');
+        }
+
+        return Column(children: const [
+          Icon(
+            Icons.sensors,
+            size: 80,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text("Hold token near phone ..."),
+          )
+        ]);
+      });
+
+  static FutureBuilder<NFCAvailability> handleNfcAvailabilityWidget =
+      FutureBuilder<NFCAvailability>(
+    future: FlutterNfcKit.nfcAvailability,
+    builder: (BuildContext context,
+        AsyncSnapshot<NFCAvailability> availabilitySnapshot) {
+      if (availabilitySnapshot.hasData &&
+          availabilitySnapshot.data == NFCAvailability.available) {
+        return readTagWidget;
+      } else if (availabilitySnapshot.hasData &&
+          availabilitySnapshot.data != NFCAvailability.available) {
+        return Column(children: const [
+          Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Error: NFC reader not available.'),
+          )
+        ]);
+      } else {
+        return Column(children: const [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Checking whether NFC feature is present...'),
+          )
+        ]);
+      }
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              FutureBuilder<NFCAvailability>(
-                future: FlutterNfcKit.nfcAvailability,
-                builder: (BuildContext context,
-                    AsyncSnapshot<NFCAvailability> snapshot) {
-                  List<Widget> children;
-                  if (snapshot.hasData &&
-                      snapshot.data == NFCAvailability.available) {
-                    children = <Widget>[
-                      const Icon(
-                        Icons.check_circle_outline,
-                        color: Colors.green,
-                        size: 60,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('Result: ${snapshot.data}'),
-                      )
-                    ];
-                  } else if (snapshot.hasError ||
-                      (snapshot.hasData &&
-                          snapshot.data != NFCAvailability.available)) {
-                    children = <Widget>[
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 60,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Text('Error: NFC reader not available.'),
-                      )
-                    ];
-                  } else {
-                    children = const <Widget>[
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text('Awaiting result...'),
-                      )
-                    ];
-                  }
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: children,
-                    ),
-                  );
-                },
-              ),
-            ]),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [handleNfcAvailabilityWidget],
+        ),
       ),
     );
   }
