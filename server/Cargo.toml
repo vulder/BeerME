@@ -23,6 +23,7 @@ dotenv = "0.15.0"
 tokio = "1.20"
 tokio-pg-mapper = "0.2.0"
 tokio-pg-mapper-derive = "0.2.0"
-tokio-postgres = { version = "0.7.6", features = ["with-uuid-0_8"] }
+tokio-postgres = { version = "0.7.6", features = ["with-uuid-0_8", "with-chrono-0_4"] }
 derive_more = "0.99.17"
 futures = "0.3.1"
+chrono = { version = "0.4.19", features = [ "serde" ] }

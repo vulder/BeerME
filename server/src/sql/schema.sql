@@ -10,7 +10,7 @@ CREATE TABLE beer_user.users (
 );
 
 CREATE TABLE beer_user.beers (
-    time            timestamp,
+    time            timestamptz,
     uuid            VARCHAR(36) NOT NULL,
     bier_brand      VARCHAR(200)
 );

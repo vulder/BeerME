@@ -61,3 +61,26 @@ impl fmt::Display for User {
     }
 }
 
+#[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
+#[pg_mapper(table = "beers")]
+pub struct BeerEntry {
+    pub uuid: String,
+    pub time: chrono::NaiveDateTime,
+    pub bier_brand: String,
+}
+
+impl BeerEntry {
+    pub fn new(uuid: String, time: chrono::NaiveDateTime, bier_brand: String) -> Self {
+        Self {
+            uuid,
+            time,
+            bier_brand,
+        }
+    }
+}
+
+impl fmt::Display for BeerEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}", self.uuid, self.time.format("%Y-%m-%d %H:%M:%S").to_string(), self.bier_brand)
+    }
+}

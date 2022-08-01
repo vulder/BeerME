@@ -23,7 +23,7 @@ use ::config::Config;
 use ::dotenv::dotenv;
 use tokio_postgres::NoTls;
 
-pub const SERVER_IP: &str = "127.0.0.1";
+pub const SERVER_IP: &str = "0.0.0.0";
 // pub const SERVER_IP: &str = "192.168.20.162";
 pub const SERVER_PORT: &str = "8090";
 
