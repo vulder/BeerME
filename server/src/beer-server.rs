@@ -14,7 +14,9 @@ mod daos;
 mod database;
 mod dtos;
 mod rfid_service;
+mod user_service;
 mod errors;
+mod app_controller;
 
 use crate::config::ServerConfig;
 use ::config::Config;
@@ -53,6 +55,7 @@ async fn main() -> io::Result<()> {
             .service(beerer::beer)
             .service(beerer::create)
             .service(beer_controller::take_beer)
+            .service(app_controller::create_user)
     })
     .bind(SERVER_IP.to_owned() + ":" + SERVER_PORT)?
     .run()

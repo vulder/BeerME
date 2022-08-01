@@ -22,16 +22,30 @@ impl fmt::Display for UserToken {
 #[derive(Deserialize, PostgresMapper, Serialize, Debug)]
 #[pg_mapper(table = "users")]
 pub struct User {
-    pub id: i64,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
     pub token: String,
 }
 
+impl User {
+    pub fn new(first_name: String, last_name: String, email: String, token: String) -> Self {
+        Self {
+            first_name,
+            last_name,
+            email,
+            token,
+        }
+    }
+
+    pub fn get_token(&self) -> UserToken {
+        UserToken::new(self.token.to_string())
+    }
+}
+
 impl fmt::Display for User {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "User{{ id: {}, first_name: {} }}", self.id, self.first_name)
+        writeln!(f, "User{{ first_name: {} }}", self.first_name)
     }
 }
 
