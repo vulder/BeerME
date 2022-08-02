@@ -7,6 +7,10 @@ edition = "2021"
 name = "beer-server"
 path = "src/beer-server.rs"
 
+[lib]
+name = "beer_core"
+path = "src/beer_core.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
