@@ -40,7 +40,7 @@ async fn main() -> io::Result<()> {
 
     let config: ServerConfig = config_.try_deserialize().unwrap();
 
-    println!("{}", config);
+    log::info!("{}", config);
 
     let pool = config.pg.create_pool(None, NoTls).unwrap();
 

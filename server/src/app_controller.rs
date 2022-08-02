@@ -1,11 +1,10 @@
 use actix_web::web::{Json, Data, Path};
 use actix_web::{HttpResponse, Error};
-use serde::{Deserialize, Serialize};
 
 use deadpool_postgres::{Client,Pool};
 use crate::constants::APPLICATION_JSON;
 
-use crate::dtos::{CreateUserRequest, UserRequest};
+use crate::dtos::CreateUserRequest;
 
 use crate::daos::UserToken;
 use crate::errors::MyError;
@@ -53,7 +52,6 @@ pub async fn user_info(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpRe
 
 #[get("/users/{user_id}/beers/summary")]
 pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
-    println!("{}", path);
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user_uuid = path.into_inner();
     let maybe_user = user_service::get_user_from_uuid(&client, user_uuid).await;

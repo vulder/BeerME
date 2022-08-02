@@ -14,8 +14,6 @@ pub async fn get_users(client: &Client) -> Result<Vec<User>, MyError> {
         .map(|row| User::from_row_ref(row).unwrap())
         .collect::<Vec<User>>();
 
-    // println!("{:?}", op_users);
-
     Ok(op_users)
 }
 
