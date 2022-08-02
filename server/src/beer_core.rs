@@ -7,7 +7,7 @@ use std::{env, io};
 use actix_web::{middleware, web, App, HttpServer};
 
 pub mod app_controller;
-mod beer_controller;
+mod reader_controller;
 mod beerer;
 pub mod config;
 mod constants;
@@ -49,7 +49,7 @@ pub async fn run() -> io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .service(beerer::beer)
             .service(beerer::create)
-            .service(beer_controller::take_beer)
+            .service(reader_controller::take_beer)
             .service(app_controller::create_user)
             .service(app_controller::user_info)
             .service(app_controller::beers_summary)

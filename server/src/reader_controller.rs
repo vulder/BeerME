@@ -8,7 +8,7 @@ use crate::dtos::{BeerRequest, BeerResponse};
 use crate::errors::MyError;
 use crate::rfid_service;
 
-#[post("/take_beer")]
+#[post("/tokens/{token_id}/beer")]
 pub async fn take_beer(
     beer_request: Json<BeerRequest>,
     db_pool: Data<Pool>,
