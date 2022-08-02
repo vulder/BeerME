@@ -47,13 +47,12 @@ pub async fn register_taken_beer(
     beer_entry: BeerEntry,
 ) -> Result<BeerEntry, MyError> {
     let _stmt = include_str!("sql/register_beer_taken.sql");
-    let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
         .query(
             &stmt,
-            &[&beer_entry.time, &beer_entry.uuid, &beer_entry.bier_brand],
+            &[&beer_entry.time, &beer_entry.uuid, &beer_entry.beer_brand],
         )
         .await?
         .iter()
@@ -69,6 +68,7 @@ pub async fn beer_entries_for_user(
 ) -> Result<Vec<BeerEntry>, MyError> {
     let _stmt = include_str!("sql/get_beer_entries_for_user.sql");
     let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let _stmt = _stmt.replace("beers.beer_brand", "beer_brands.beer_brand");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     let op_users = client

@@ -60,3 +60,7 @@ pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary
         fav_beer,
     )
 }
+
+// pub async fn beer_brands(client: &Client) -> Vec<String> {
+// 
+// }

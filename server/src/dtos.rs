@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::fmt;
 
 use crate::daos::{BeerEntry, User, UserToken};
 use uuid::Uuid;

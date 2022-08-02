@@ -81,15 +81,15 @@ impl fmt::Display for User {
 pub struct BeerEntry {
     pub uuid: String,
     pub time: chrono::NaiveDateTime,
-    pub bier_brand: String,
+    pub beer_brand: String,
 }
 
 impl BeerEntry {
-    pub fn new(uuid: String, time: chrono::NaiveDateTime, bier_brand: String) -> Self {
+    pub fn new(uuid: String, time: chrono::NaiveDateTime, beer_brand: String) -> Self {
         Self {
             uuid,
             time,
-            bier_brand,
+            beer_brand,
         }
     }
 }
@@ -101,7 +101,7 @@ impl fmt::Display for BeerEntry {
             "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}",
             self.uuid,
             self.time.format("%Y-%m-%d %H:%M:%S").to_string(),
-            self.bier_brand
+            self.beer_brand
         )
     }
 }

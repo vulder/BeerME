@@ -77,3 +77,14 @@ pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
             .finish()),
     }
 }
+
+// #[get("/beers/brands")]
+// pub async fn beer_brands(db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
+//     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+//     let brand_list = rfid_service::beer_brands(&client).await;
+// 
+//     Ok(HttpResponse::Ok()
+//        .content_type(APPLICATION_JSON)
+//        .json(brand_list)
+//     )
+// }
