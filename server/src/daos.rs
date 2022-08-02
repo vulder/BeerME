@@ -1,5 +1,5 @@
-use std::fmt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use tokio_pg_mapper_derive::PostgresMapper;
 use uuid::Uuid;
 
@@ -10,7 +10,9 @@ pub struct UserToken {
 
 impl UserToken {
     pub fn new(id: String) -> Self {
-        Self { id: UserToken::sanitize(id) }
+        Self {
+            id: UserToken::sanitize(id),
+        }
     }
 
     pub fn parse_from_string(raw_string: String) -> Option<UserToken> {
@@ -18,7 +20,11 @@ impl UserToken {
     }
 
     pub fn sanitize(raw_token: String) -> String {
-        raw_token.chars().filter(|c| !c.is_whitespace()).map(|c| c.to_uppercase().to_string()).collect()
+        raw_token
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .map(|c| c.to_uppercase().to_string())
+            .collect()
     }
 }
 
@@ -39,7 +45,13 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(uuid: Uuid, first_name: String, last_name: String, email: String, token: String) -> Self {
+    pub fn new(
+        uuid: Uuid,
+        first_name: String,
+        last_name: String,
+        email: String,
+        token: String,
+    ) -> Self {
         Self {
             uuid: uuid.to_string(),
             first_name,
@@ -56,7 +68,11 @@ impl User {
 
 impl fmt::Display for User {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "User{{ uuid: {}, first_name: {} }}", self.uuid, self.first_name)
+        writeln!(
+            f,
+            "User{{ uuid: {}, first_name: {} }}",
+            self.uuid, self.first_name
+        )
     }
 }
 
@@ -80,11 +96,15 @@ impl BeerEntry {
 
 impl fmt::Display for BeerEntry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}", self.uuid, self.time.format("%Y-%m-%d %H:%M:%S").to_string(), self.bier_brand)
+        writeln!(
+            f,
+            "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}",
+            self.uuid,
+            self.time.format("%Y-%m-%d %H:%M:%S").to_string(),
+            self.bier_brand
+        )
     }
 }
-
-
 
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]

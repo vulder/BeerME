@@ -1,15 +1,18 @@
-use actix_web::web::{Json, Data};
-use actix_web::{HttpResponse, Error};
+use actix_web::web::{Data, Json};
+use actix_web::{Error, HttpResponse};
 
-use deadpool_postgres::{Client,Pool};
 use crate::constants::APPLICATION_JSON;
+use deadpool_postgres::{Client, Pool};
 
 use crate::dtos::{BeerRequest, BeerResponse};
-use crate::rfid_service;
 use crate::errors::MyError;
+use crate::rfid_service;
 
 #[post("/take_beer")]
-pub async fn take_beer(beer_request: Json<BeerRequest>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
+pub async fn take_beer(
+    beer_request: Json<BeerRequest>,
+    db_pool: Data<Pool>,
+) -> Result<HttpResponse, Error> {
     log::debug!("Register_beer for {:?}", beer_request);
 
     let maybe_token = beer_request.to_user_token();
@@ -21,7 +24,9 @@ pub async fn take_beer(beer_request: Json<BeerRequest>, db_pool: Data<Pool>) -> 
             if rfid_service::is_token_registered(&client, token).await {
                 let success = rfid_service::register_taken_beer(&client, token);
                 if !success.await {
-                    return Ok(HttpResponse::InternalServerError().reason("Could not register taken beer").finish());
+                    return Ok(HttpResponse::InternalServerError()
+                        .reason("Could not register taken beer")
+                        .finish());
                 }
                 response.valid = true;
             }

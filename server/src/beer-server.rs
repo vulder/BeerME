@@ -4,8 +4,9 @@ extern crate log;
 
 use std::{env, io};
 
-use actix_web::{middleware, App, HttpServer, web};
+use actix_web::{middleware, web, App, HttpServer};
 
+mod app_controller;
 mod beer_controller;
 mod beerer;
 mod config;
@@ -13,10 +14,9 @@ mod constants;
 mod daos;
 mod database;
 mod dtos;
+mod errors;
 mod rfid_service;
 mod user_service;
-mod errors;
-mod app_controller;
 
 use crate::config::ServerConfig;
 use ::config::Config;

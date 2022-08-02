@@ -1,32 +1,38 @@
-use actix_web::web::{Json, Data, Path};
-use actix_web::{HttpResponse, Error};
+use actix_web::web::{Data, Json, Path};
+use actix_web::{Error, HttpResponse};
 
-use deadpool_postgres::{Client,Pool};
 use crate::constants::APPLICATION_JSON;
+use deadpool_postgres::{Client, Pool};
 
 use crate::dtos::CreateUserRequest;
 
 use crate::daos::UserToken;
 use crate::errors::MyError;
-use crate::user_service;
 use crate::rfid_service;
+use crate::user_service;
 
 #[post("/users")]
-pub async fn create_user(create_user_req: Json<CreateUserRequest>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
-
+pub async fn create_user(
+    create_user_req: Json<CreateUserRequest>,
+    db_pool: Data<Pool>,
+) -> Result<HttpResponse, Error> {
     let maybe_user = create_user_req.to_user();
 
     match &maybe_user {
         Some(user) => {
             let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
             if rfid_service::is_token_registered(&client, &user.get_token()).await {
-                Ok(HttpResponse::Conflict().reason("Token was already registered").finish())
+                Ok(HttpResponse::Conflict()
+                    .reason("Token was already registered")
+                    .finish())
             } else {
                 let created_user = user_service::create_user(&client, user).await;
                 Ok(HttpResponse::Created().json(created_user))
             }
-        },
-        None => Ok(HttpResponse::BadRequest().reason("Token not registered").finish()),
+        }
+        None => Ok(HttpResponse::BadRequest()
+            .reason("Token not registered")
+            .finish()),
     }
 }
 
@@ -42,11 +48,14 @@ pub async fn user_info(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpRe
             if let Some(user) = user {
                 Ok(HttpResponse::Ok().json(user))
             } else {
-                Ok(HttpResponse::NotFound().reason("Token was not registered").finish())
+                Ok(HttpResponse::NotFound()
+                    .reason("Token was not registered")
+                    .finish())
             }
-
-        },
-        None => Ok(HttpResponse::BadRequest().reason("Token id was wrongly formatted").finish()),
+        }
+        None => Ok(HttpResponse::BadRequest()
+            .reason("Token id was wrongly formatted")
+            .finish()),
     }
 }
 
@@ -59,8 +68,12 @@ pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
     match &maybe_user {
         Some(user) => {
             let beer_summary = rfid_service::calculate_beer_summary(&client, user).await;
-            Ok(HttpResponse::Ok().content_type(APPLICATION_JSON).json(beer_summary))
-        },
-        None => Ok(HttpResponse::NotFound().reason("User was not registered in the system").finish()),
+            Ok(HttpResponse::Ok()
+                .content_type(APPLICATION_JSON)
+                .json(beer_summary))
+        }
+        None => Ok(HttpResponse::NotFound()
+            .reason("User was not registered in the system")
+            .finish()),
     }
 }

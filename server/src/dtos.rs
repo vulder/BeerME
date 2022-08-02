@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::daos::{BeerEntry, User, UserToken};
 use uuid::Uuid;
-use crate::daos::{User, UserToken, BeerEntry};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BeerRequest {
@@ -79,10 +79,23 @@ pub struct BeerSummary {
 }
 
 impl BeerSummary {
-    pub fn new(today: i64, week: i64, month: i64, total: i64, unpaid: i8, recent_beers: Vec<BeerEntry>, favorite_beer: String) -> Self {
+    pub fn new(
+        today: i64,
+        week: i64,
+        month: i64,
+        total: i64,
+        unpaid: i8,
+        recent_beers: Vec<BeerEntry>,
+        favorite_beer: String,
+    ) -> Self {
         Self {
             today,
-            week, month,total,unpaid,recent_beers,favorite_beer,
+            week,
+            month,
+            total,
+            unpaid,
+            recent_beers,
+            favorite_beer,
         }
     }
 }

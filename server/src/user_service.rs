@@ -8,9 +8,19 @@ pub async fn create_user(client: &Client, user: &User) -> User {
 }
 
 pub async fn get_user(client: &Client, user_token: &UserToken) -> Option<User> {
-    database::get_users(client).await.unwrap().iter().find(|user| user.token == user_token.id ).cloned()
+    database::get_users(client)
+        .await
+        .unwrap()
+        .iter()
+        .find(|user| user.token == user_token.id)
+        .cloned()
 }
 
 pub async fn get_user_from_uuid(client: &Client, uuid: String) -> Option<User> {
-    database::get_users(client).await.unwrap().iter().find(|user| user.uuid == uuid ).cloned()
+    database::get_users(client)
+        .await
+        .unwrap()
+        .iter()
+        .find(|user| user.uuid == uuid)
+        .cloned()
 }
