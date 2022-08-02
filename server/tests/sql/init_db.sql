@@ -7,10 +7,6 @@ INSERT INTO beer_user.users VALUES ('b8f8666f-adb9-43fc-9b30-a2c0a5149ac9', 'deb
 INSERT INTO beer_user.users VALUES ('8b981764-76f7-4098-9cc6-525473dec745', 'the'       , 'last'          , 'one'           , 'B35B46AC');
 INSERT INTO beer_user.users VALUES ('aa981764-76f7-4098-9cc6-525473dec7aa', 'A'         , 'a'             , 'a@a.com'       , 'AAAAAAAA');
 
-INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('ByNFlowsMom' , 'Dunkel');
-INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Ali Braeu'   , 'Weizen');
-INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Augustiner'  , 'Hell');
-
 INSERT INTO beer_user.beers VALUES ('2022-08-01 20:49:28.785094', '27f78a8c-80d3-4e3d-be52-c5c1c0063a6c', (SELECT brand_id FROM beer_user.beer_brands WHERE beer_brand = 'ByNFlowsMom'));
 INSERT INTO beer_user.beers VALUES ('2022-08-01 22:11:53.792822', '27f78a8c-80d3-4e3d-be52-c5c1c0063a6c', (SELECT brand_id FROM beer_user.beer_brands WHERE beer_brand = 'ByNFlowsMom'));
 INSERT INTO beer_user.beers VALUES ('2022-07-30 22:11:53.792822', '27f78a8c-80d3-4e3d-de52-c5c1c0063a6d', (SELECT brand_id FROM beer_user.beer_brands WHERE beer_brand = 'Ali Braeu'));
