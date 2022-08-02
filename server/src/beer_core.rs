@@ -6,10 +6,10 @@ use std::{env, io};
 
 use actix_web::{middleware, web, App, HttpServer};
 
-mod app_controller;
+pub mod app_controller;
 mod beer_controller;
 mod beerer;
-mod config;
+pub mod config;
 mod constants;
 pub mod daos;
 mod database;
@@ -58,4 +58,3 @@ pub async fn run() -> io::Result<()> {
     .run()
     .await
 }
-

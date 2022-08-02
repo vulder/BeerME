@@ -12,8 +12,8 @@ impl fmt::Display for ServerConfig {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "ServerConfig{{ server_addr: {:?}, server_port: {:?}, pg: {:?}}}",
-            self.server_addr, self.server_port, self.pg.user
+            "ServerConfig{{ server_addr: {:?}, server_port: {:?}, pb.user: {:?}, pg: {:?}}}",
+            self.server_addr, self.server_port, self.pg.user, self.pg.dbname
         )
     }
 }
