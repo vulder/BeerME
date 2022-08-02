@@ -23,10 +23,6 @@ use ::config::Config;
 use ::dotenv::dotenv;
 use tokio_postgres::NoTls;
 
-pub const SERVER_IP: &str = "0.0.0.0";
-// pub const SERVER_IP: &str = "192.168.20.162";
-pub const SERVER_PORT: &str = "8090";
-
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     env::set_var(
@@ -59,7 +55,7 @@ async fn main() -> io::Result<()> {
             .service(app_controller::user_info)
             .service(app_controller::beers_summary)
     })
-    .bind(SERVER_IP.to_owned() + ":" + SERVER_PORT)?
+    .bind(config.server_addr.to_owned() + ":" + &config.server_port)?
     .run()
     .await
 }
