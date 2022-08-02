@@ -1,27 +1,24 @@
 import 'dart:convert';
 
+import 'package:app/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/dto/user.dart';
+import 'package:app/screens/register_form.dart';
 
 class Register extends StatelessWidget {
-  static var registrationWidget = (String tokenId) {
-    return Column();
-  };
-
   static var sanitize = (String token) {
     return token.replaceAll(RegExp(r'/^[A-Fa-f0-9]/'), "");
   };
   static var retrieveUserWidget = (String tokenId) {
     return FutureBuilder(
-        future: http.get(Uri.http(
-            "192.168.1.177:8080", "/tokens/${sanitize(tokenId)}/user")),
+        future: Api.retrieveUser(sanitize(tokenId)),
         builder: (BuildContext context,
             AsyncSnapshot<http.Response> retrieveUserSnapshot) {
           if (retrieveUserSnapshot.hasData) {
             if (retrieveUserSnapshot.data?.statusCode == 404) {
-              return registrationWidget(tokenId);
+              return RegistrationForm(tokenId);
             } else if (retrieveUserSnapshot.data?.statusCode == 200) {
               var user = UserDto.fromJson(
                   json.decode('${retrieveUserSnapshot.data?.body}'));
@@ -86,7 +83,7 @@ class Register extends StatelessWidget {
       future: FlutterNfcKit.poll(),
       builder: (BuildContext context, AsyncSnapshot<NFCTag> snapshot) {
         if (snapshot.hasData) {
-          return retrieveUser('${snapshot.data?.id}');
+          return retrieveUserWidget('${snapshot.data?.id}');
         }
 
         return Column(children: const [
@@ -137,6 +134,8 @@ class Register extends StatelessWidget {
       }
     },
   );
+
+  Register({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
