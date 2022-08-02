@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:app/api.dart';
+import 'package:app/dto/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:http/http.dart' as http;
-import 'package:app/dto/user.dart';
 import 'package:app/screens/register_form.dart';
 
 class Register extends StatelessWidget {
@@ -74,8 +74,6 @@ class Register extends StatelessWidget {
               )
             ]);
           }
-
-          return Text(retrieveUserSnapshot.data.toString());
         });
   };
 
@@ -84,6 +82,19 @@ class Register extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<NFCTag> snapshot) {
         if (snapshot.hasData) {
           return retrieveUserWidget('${snapshot.data?.id}');
+        } else if (snapshot.hasError) {
+          return Column(children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child:
+                  Text('User data retrieval failed. Error: ${snapshot.error}'),
+            )
+          ]);
         }
 
         return Column(children: const [
