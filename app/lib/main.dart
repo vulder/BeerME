@@ -17,6 +17,7 @@ class App extends StatelessWidget {
     return MultiProvider(
         providers: [
           Provider(create: (context) => UserModel()),
+          ChangeNotifierProvider(create: (context) => UserModel()),
         ],
         child: MaterialApp(
           title: 'Hey you, beer me!',

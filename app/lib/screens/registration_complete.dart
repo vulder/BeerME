@@ -1,13 +1,25 @@
 import 'dart:convert';
 
+import 'package:app/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/dto/user.dart';
+import 'package:provider/provider.dart';
 
-class RegistrationComplete extends StatelessWidget {
+class RegistrationComplete extends StatefulWidget {
   final Future<http.Response> registerRequest;
 
   RegistrationComplete(this.registerRequest);
+
+  @override
+  State<StatefulWidget> createState() =>
+      _RegistrationCompleteState(registerRequest);
+}
+
+class _RegistrationCompleteState extends State<StatefulWidget> {
+  final Future<http.Response> registerRequest;
+
+  _RegistrationCompleteState(this.registerRequest);
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +30,16 @@ class RegistrationComplete extends StatelessWidget {
           title: Text("Registraiton Confirmation"),
         ),
         body: FutureBuilder<http.Response>(
-            future: this.registerRequest,
+            future: registerRequest,
             builder:
                 (BuildContext context, AsyncSnapshot<http.Response> snapshot) {
               if (snapshot.hasData) {
                 final UserDto user =
                     UserDto.fromJson(jsonDecode("${snapshot.data?.body}"));
+
+                setState(() {
+                  context.read<UserModel>().id = user.uuid;
+                });
 
                 return Column(children: [
                   const Icon(

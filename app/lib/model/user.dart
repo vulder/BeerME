@@ -10,5 +10,5 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool hasValidId() => _id == "";
+  bool hasValidId() => _id != "";
 }
