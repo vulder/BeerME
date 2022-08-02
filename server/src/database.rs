@@ -5,7 +5,7 @@ use tokio_pg_mapper::FromTokioPostgresRow;
 
 pub async fn get_users(client: &Client) -> Result<Vec<User>, MyError> {
     let _stmt = include_str!("sql/get_users.sql");
-    let _stmt = _stmt.replace("$table_fields", "*");
+    let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     let op_users = client
@@ -86,7 +86,6 @@ pub async fn beer_summary_values_for_user(
     user: &User,
 ) -> Result<UserBeerCount, MyError> {
     let _stmt = include_str!("sql/get_beer_user_summary.sql");
-    // let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
