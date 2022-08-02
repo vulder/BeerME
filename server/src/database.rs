@@ -1,4 +1,4 @@
-use crate::daos::{BeerEntry, User, UserBeerCount};
+use crate::daos::{BeerEntry, User, UserBeerCount, BeerBrandEntry};
 use crate::errors::MyError;
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;
@@ -108,4 +108,17 @@ pub async fn favorite_beer_for_user(client: &Client, user: &User) -> Result<Stri
         .pop()
         .map(|x| x.get(0))
         .ok_or(MyError::NotFound)
+}
+
+pub async fn beer_brands(client: &Client) -> Result<Vec<BeerBrandEntry>, MyError> {
+    let _stmt = include_str!("sql/beer_brands.sql");
+    let _stmt = _stmt.replace("$table_fields", &BeerBrandEntry::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    Ok(client
+        .query(&stmt, &[])
+        .await?
+        .iter()
+        .map(|row| BeerBrandEntry::from_row_ref(row).unwrap())
+        .collect::<Vec<BeerBrandEntry>>())
 }

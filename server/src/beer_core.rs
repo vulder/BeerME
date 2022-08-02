@@ -53,6 +53,7 @@ pub async fn run() -> io::Result<()> {
             .service(app_controller::create_user)
             .service(app_controller::user_info)
             .service(app_controller::beers_summary)
+            .service(app_controller::beer_brands)
     })
     .bind(config.server_addr.to_owned() + ":" + &config.server_port)?
     .run()

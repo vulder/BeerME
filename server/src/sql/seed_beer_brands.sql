@@ -3,3 +3,4 @@ INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Ali Braeu'   , 
 INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Augustiner'  , 'Hell');
 INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Kneitinger'  , 'Hell');
 INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Prösslbräu'  , 'Palmator');
+INSERT INTO beer_user.beer_brands(beer_brand, beer_type) VALUES('Goss-Bräu'  , 'Hell');

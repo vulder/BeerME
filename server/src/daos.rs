@@ -114,3 +114,21 @@ pub struct UserBeerCount {
     pub week: i64,
     pub month: i64,
 }
+
+#[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
+#[pg_mapper(table = "beer_brands")]
+pub struct BeerBrandEntry {
+    beer_brand: String,
+    beer_type: String,
+}
+
+impl fmt::Display for BeerBrandEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(
+            f,
+            "BeerBrandEntry{{ beer_brand: {}, beer_type: {} }}",
+            self.beer_brand,
+            self.beer_type,
+        )
+    }
+}

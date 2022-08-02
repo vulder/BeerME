@@ -1,4 +1,4 @@
-use crate::daos::BeerEntry;
+use crate::daos::{BeerEntry, BeerBrandEntry};
 use crate::daos::{User, UserToken};
 use crate::dtos::BeerSummary;
 use crate::user_service;
@@ -61,6 +61,6 @@ pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary
     )
 }
 
-// pub async fn beer_brands(client: &Client) -> Vec<String> {
-// 
-// }
+pub async fn beer_brands(client: &Client) -> Vec<BeerBrandEntry> {
+    database::beer_brands(client).await.unwrap()
+}
