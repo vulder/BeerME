@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:app/screens/statistics.dart';
 import 'package:app/screens/register.dart';
+import 'package:app/model/user.dart';
 
 void main() {
   runApp(const App());
@@ -12,13 +14,17 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Hey you, beer me!',
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-      ),
-      home: const MainPage(title: 'Hey you, beer me!'),
-    );
+    return MultiProvider(
+        providers: [
+          Provider(create: (context) => UserModel()),
+        ],
+        child: MaterialApp(
+          title: 'Hey you, beer me!',
+          theme: ThemeData(
+            primarySwatch: Colors.grey,
+          ),
+          home: const MainPage(title: 'Hey you, beer me!'),
+        ));
   }
 }
 
