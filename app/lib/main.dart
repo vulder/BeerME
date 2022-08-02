@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:app/screens/statistics.dart';
 import 'package:app/screens/register.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 void main() {
   runApp(const App());
 }
@@ -12,22 +14,26 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return BlocProvider(
+      create: (_) => ThemeCubit(),
+      child: const AppView(),
+    ); 
+  }
+}
+
+class AppView extends StatelessWidget {
+  const MainPage({Key? key, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+  return MaterialApp(
       title: 'Hey you, beer me!',
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
       home: const MainPage(title: 'Hey you, beer me!'),
     );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
-  @override
-  State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
