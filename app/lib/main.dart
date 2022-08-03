@@ -1,3 +1,4 @@
+import 'package:app/dto/user.dart';
 import 'package:app/fragment/read_tag.dart';
 import 'package:app/fragment/register_form.dart';
 import 'package:app/fragment/retrieve_user.dart';
@@ -43,21 +44,27 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ReadTagIdFragment(
-                child: RetreiveUserFragment(
-              successChild: const StatisticsFragment(),
-              failedChild: const RegistrationFragment(),
-            ))
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Provider.of<UserModel>(context).hasValidId()
+                        ? const StatisticsFragment()
+                        : const ReadTagIdFragment(
+                            child: RetreiveUserFragment(
+                            failedChild: RegistrationFragment(),
+                          ))
+                  ],
+                ),
+              ),
+            )));
   }
 }
