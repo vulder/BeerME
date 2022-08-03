@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-class Statistics extends StatefulWidget {
+class StatisticsFragment extends StatefulWidget {
+  const StatisticsFragment({Key? key}) : super(key: key);
+
   @override
-  _StatisticsState createState() => _StatisticsState();
+  State<StatisticsFragment> createState() => _StatisticsFragmentState();
 }
 
-class _StatisticsState extends State<Statistics> {
+class _StatisticsFragmentState extends State<StatisticsFragment> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(
@@ -47,12 +49,9 @@ class _StatisticsState extends State<Statistics> {
                         Padding(
                             padding: const EdgeInsets.only(top: 16),
                             child: IconButton(
-                              icon: const Icon(Icons.refresh),
-                              tooltip: 'Refresh',
-                              onPressed: () {
-                                setState(() {});
-                              },
-                            ))
+                                icon: const Icon(Icons.refresh),
+                                tooltip: 'Refresh',
+                                onPressed: () => setState(() {})))
                       ]);
                 } else {
                   return Column(children: [

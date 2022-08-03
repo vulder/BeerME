@@ -11,8 +11,8 @@ class UserService {
   }
 
   static Future<WrappedResponse<UserDto>> retrieveUserAndUpdateState(
-      final UserModel model, final String tokenId) async {
-    var response = await Api.retrieveUser(_sanitizeToken(tokenId));
+      final UserModel model) async {
+    var response = await Api.retrieveUser(_sanitizeToken(model.tokenId));
     var user = null;
     if (response.statusCode == 200) {
       user = UserDto.fromJson(jsonDecode(response.body));

@@ -39,7 +39,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-  static List<Widget> _screens = <Widget>[Statistics(), Register()];
+  static List<Widget> _screens = <Widget>[StatisticsFragment(), Register()];
 
   @override
   Widget build(BuildContext context) {
