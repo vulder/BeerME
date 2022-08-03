@@ -118,8 +118,8 @@ pub struct UserBeerCount {
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beer_brands")]
 pub struct BeerBrandEntry {
-    beer_brand: String,
-    beer_type: String,
+    pub beer_brand: String,
+    pub beer_type: String,
 }
 
 impl fmt::Display for BeerBrandEntry {

@@ -5,7 +5,8 @@ mod tests {
     use crate::test_utils::get_testing_config;
 
     use actix_web::{http::StatusCode, test, web, App};
-    use beer_core::entities::User;
+    use beer_core::app_controller::beer_brands;
+    use beer_core::entities::{User, BeerBrandEntry};
     use tokio_postgres::NoTls;
 
     #[actix_web::test]
@@ -57,5 +58,35 @@ mod tests {
             StatusCode::NOT_FOUND,
             "Server did not reject unknown user"
         );
+    }
+
+    #[actix_web::test]
+    async fn test_get_beer_brands() {
+        let config = get_testing_config();
+        let pool = config.pg.create_pool(None, NoTls).unwrap();
+        let app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(pool.clone()))
+                .service(beer_core::app_controller::beer_brands),
+        )
+        .await;
+
+        let req = test::TestRequest::get()
+            .uri("/beers/brands")
+            .send_request(&app)
+            .await;
+
+        assert!(req.status().is_success(), "Failed to request beer brands");
+        let brands: Vec<BeerBrandEntry> = test::read_body_json(req).await;
+
+        let maybe_unknown = brands.iter().find(|brand| brand.beer_brand == "Unknown".to_string());
+        assert!(maybe_unknown.is_some(), "Could not get default beer brand unknown");
+        let unknown = maybe_unknown.unwrap();
+        assert_eq!(unknown.beer_brand, "Unknown");
+        assert_eq!(unknown.beer_type, "Unknown");
+
+        let augustiner = brands.iter().find(|brand| brand.beer_brand == "Augustiner".to_string()).unwrap();
+        assert_eq!(augustiner.beer_brand, "Augustiner");
+        assert_eq!(augustiner.beer_type, "Hell");
     }
 }
