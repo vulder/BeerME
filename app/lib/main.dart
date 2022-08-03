@@ -54,9 +54,9 @@ class _MainPageState extends State<MainPage> {
           actions: <Widget>[
             Padding(
                 padding: EdgeInsets.only(right: 20.0),
-                child: IconButton(
-                  onPressed: () => context.read<UserModel>().resetId(),
-                  icon: Icon(
+                child: GestureDetector(
+                  onTap: () => context.read<UserModel>().resetId(),
+                  child: Icon(
                     Icons.logout_outlined,
                     size: 26.0,
                   ),
