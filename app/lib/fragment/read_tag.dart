@@ -48,10 +48,9 @@ class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
             ),
             Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton(
-                    child: Row(
-                      children: const [Icon(Icons.refresh), Text('Retry')],
-                    ),
+                child: ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
                     onPressed: () => setState(() {})))
           ]);
         } else if (snapshot.hasError) {
@@ -67,10 +66,9 @@ class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
             ),
             Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton(
-                    child: Row(
-                      children: const [Icon(Icons.refresh), Text('Retry')],
-                    ),
+                child: ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
                     onPressed: () => setState(() {})))
           ]);
         }

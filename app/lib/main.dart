@@ -45,7 +45,12 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Row(children: [
+            const Icon(
+              Icons.sports_bar,
+            ),
+            Text(widget.title)
+          ]),
         ),
         body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
