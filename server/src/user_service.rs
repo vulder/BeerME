@@ -1,6 +1,6 @@
 use deadpool_postgres::Client;
 
-use crate::daos::{User, UserToken};
+use crate::entities::{User, UserToken};
 use crate::database;
 
 pub async fn create_user(client: &Client, user: &User) -> User {

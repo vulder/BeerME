@@ -6,7 +6,7 @@ use deadpool_postgres::{Client, Pool};
 
 use crate::dtos::CreateUserRequest;
 
-use crate::daos::UserToken;
+use crate::entities::UserToken;
 use crate::errors::MyError;
 use crate::rfid_service;
 use crate::user_service;

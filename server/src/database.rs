@@ -1,4 +1,4 @@
-use crate::daos::{BeerEntry, User, UserBeerCount, BeerBrandEntry};
+use crate::entities::{BeerEntry, User, UserBeerCount, BeerBrandEntry};
 use crate::errors::MyError;
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;

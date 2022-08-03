@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::daos::{BeerEntry, User, UserToken};
+use crate::entities::{BeerEntry, User, UserToken};
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]

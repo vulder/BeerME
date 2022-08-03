@@ -1,5 +1,5 @@
 mod tests {
-    use beer_core::daos::UserToken;
+    use beer_core::entities::UserToken;
     #[test]
     fn sanitize_user_token_rm_ws() {
         assert_eq!("1F00", UserToken::sanitize("1F 00".to_string()));

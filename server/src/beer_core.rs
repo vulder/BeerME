@@ -11,7 +11,7 @@ mod reader_controller;
 mod beerer;
 pub mod config;
 mod constants;
-pub mod daos;
+pub mod entities;
 mod database;
 pub mod dtos;
 mod errors;
