@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-class StatisticsFragment extends StatefulWidget {
-  const StatisticsFragment({Key? key}) : super(key: key);
+class StatisticsScreen extends StatefulWidget {
+  const StatisticsScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatisticsFragment> createState() => _StatisticsFragmentState();
+  State<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
 class Element {
@@ -27,11 +27,11 @@ class Element {
       required this.accent});
 }
 
-class _StatisticsFragmentState extends State<StatisticsFragment> {
+class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserModel>(builder: (context, user, child) {
-      if (!user.hasValidId()) {
+      if (!user.hasId()) {
         return const Text("Please register your device fist.");
       }
 

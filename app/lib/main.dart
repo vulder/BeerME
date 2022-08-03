@@ -1,11 +1,11 @@
 import 'package:app/dto/user.dart';
 import 'package:app/fragment/read_tag.dart';
 import 'package:app/fragment/register_form.dart';
-import 'package:app/fragment/retrieve_user.dart';
+import 'package:app/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:app/fragment/statistics.dart';
+import 'package:app/screens/statistics.dart';
 import 'package:app/model/user.dart';
 
 void main() {
@@ -61,12 +61,9 @@ class _MainPageState extends State<MainPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Provider.of<UserModel>(context).hasValidId()
-                        ? const StatisticsFragment()
-                        : const ReadTagIdFragment(
-                            child: RetreiveUserFragment(
-                            failedChild: RegistrationFragment(),
-                          ))
+                    Provider.of<UserModel>(context).hasId()
+                        ? const StatisticsScreen()
+                        : RegisterScreen(),
                   ],
                 ),
               ),

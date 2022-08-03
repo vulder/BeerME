@@ -8,16 +8,18 @@ import 'package:http/http.dart';
 
 import 'package:provider/provider.dart';
 
-class RegistrationFragment extends StatefulWidget {
-  const RegistrationFragment({Key? key}) : super(key: key);
+class SignUpFragment extends StatefulWidget {
+  String tokenId;
+
+  SignUpFragment({Key? key, required this.tokenId}) : super(key: key);
 
   @override
-  State<RegistrationFragment> createState() => _RegistrationFragmentState();
+  State<SignUpFragment> createState() => _SignUpFragmentState();
 }
 
 enum Status { none, loading, success, failed }
 
-class _RegistrationFragmentState extends State<RegistrationFragment> {
+class _SignUpFragmentState extends State<SignUpFragment> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final firstName = TextEditingController();
   final lastName = TextEditingController();
@@ -114,7 +116,7 @@ class _RegistrationFragmentState extends State<RegistrationFragment> {
                                 first_name: firstName.text,
                                 last_name: lastName.text,
                                 email: email.text,
-                                token: context.read<UserModel>().tokenId));
+                                token: widget.tokenId));
                             setState(() {
                               if (response.statusCode == 201) {
                                 status = Status.success;

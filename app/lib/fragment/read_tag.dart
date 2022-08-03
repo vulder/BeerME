@@ -5,85 +5,131 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:provider/provider.dart';
 
 class ReadTagIdFragment extends StatefulWidget {
-  final Widget child;
+  final Function(NFCTag?) onSuccess;
 
-  const ReadTagIdFragment({Key? key, required this.child}) : super(key: key);
+  const ReadTagIdFragment({Key? key, required this.onSuccess})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ReadTagIdFragmentState();
 }
 
 class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
-  Future<NFCAvailability> retrieveId(UserModel model) async {
-    try {
-      var status = await FlutterNfcKit.nfcAvailability;
-      if (status == NFCAvailability.available) {
-        final NFCTag tag = await FlutterNfcKit.poll();
-        model.tokenId = tag.id;
-      }
+  bool _hasError = false;
+  bool _hasNfc = false;
+  bool _isPolling = false;
 
-      return status;
+  Future<NFCTag?> read() async {
+    setState(() {
+      _hasError = false;
+    });
+    try {
+      if (_hasNfc) {
+        setState(() {
+          _isPolling = true;
+          _hasNfc = true;
+        });
+
+        return await FlutterNfcKit.poll();
+      }
     } on PlatformException catch (e) {
-      return Future.error(e);
+      setState(() {
+        _hasError = false;
+      });
+    } finally {
+      setState(() {
+        _isPolling = false;
+      });
     }
+
+    return null;
+  }
+
+  checkNfc() {
+    setState(() {
+      _hasNfc = false;
+    });
+    return FlutterNfcKit.nfcAvailability.then((NFCAvailability availability) {
+      if (availability == NFCAvailability.available) {
+        setState(() {
+          _hasNfc = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkNfc();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<NFCAvailability>(
-      future: retrieveId(context.read<UserModel>()),
-      builder: (BuildContext context, AsyncSnapshot<NFCAvailability> snapshot) {
-        if (snapshot.hasData && snapshot.data == NFCAvailability.available) {
-          return widget.child;
-        } else if (snapshot.hasData) {
-          return Column(children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 60,
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Text('NFC reader not available.'),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                    onPressed: () => setState(() {})))
-          ]);
-        } else if (snapshot.hasError) {
-          return Column(children: [
-            const Icon(
-              Icons.warning_outlined,
-              color: Colors.yellow,
-              size: 60,
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Text('Failed to read token.'),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                    onPressed: () => setState(() {})))
-          ]);
-        }
+    if (_isPolling) {
+      return Column(children: const [
+        Icon(
+          Icons.sensors,
+          size: 80,
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text("Hold token near phone ..."),
+        )
+      ]);
+    }
 
-        return Column(children: const [
-          Icon(
-            Icons.sensors,
-            size: 80,
+    if (_hasError) {
+      return Column(children: [
+        const Icon(
+          Icons.warning_outlined,
+          color: Colors.yellow,
+          size: 60,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Failed to read token.'),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+                onPressed: () => setState(() => _hasError = false)))
+      ]);
+    }
+
+    if (!_hasNfc) {
+      return Column(children: [
+        const Icon(
+          Icons.error_outline,
+          color: Colors.red,
+          size: 60,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('NFC reader not available.'),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+                onPressed: () => setState(() => checkNfc())))
+      ]);
+    }
+
+    return ButtonTheme(
+      minWidth: 200.0,
+      height: 100.0,
+      child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            onPrimary: Theme.of(context).colorScheme.onPrimary,
+            primary: Theme.of(context).colorScheme.primary,
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: Text("Hold token near phone ..."),
-          )
-        ]);
-      },
+          icon: const Icon(Icons.sensors),
+          label: const Text('Register Token'),
+          onPressed: () => read().then((value) => widget.onSuccess(value))),
     );
   }
 }
