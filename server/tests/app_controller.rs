@@ -5,7 +5,7 @@ mod tests {
     use crate::test_utils::get_testing_config;
 
     use actix_web::{test, web, App, http::StatusCode};
-    use beer_core::{daos::User, dtos::BeerSummary};
+    use beer_core::daos::User;
     use tokio_postgres::NoTls;
 
     #[actix_web::test]

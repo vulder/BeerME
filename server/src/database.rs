@@ -107,6 +107,7 @@ pub async fn favorite_beer_for_user(client: &Client, user: &User) -> Result<Stri
         .await?
         .pop()
         .map(|x| x.get(0))
+        .or_else(|| Some("None".to_string()))
         .ok_or(MyError::NotFound)
 }
 
