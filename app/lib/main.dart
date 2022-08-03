@@ -1,8 +1,10 @@
+import 'package:app/fragment/read_tag.dart';
+import 'package:app/fragment/register_form.dart';
+import 'package:app/fragment/retrieve_user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:app/screens/statistics.dart';
-import 'package:app/screens/register.dart';
+import 'package:app/fragment/statistics.dart';
 import 'package:app/model/user.dart';
 
 void main() {
@@ -22,7 +24,7 @@ class App extends StatelessWidget {
         child: MaterialApp(
           title: 'Hey you, beer me!',
           theme: ThemeData(
-            primarySwatch: Colors.grey,
+            primarySwatch: Colors.yellow,
           ),
           home: const MainPage(title: 'Hey you, beer me!'),
         ));
@@ -38,36 +40,24 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 0;
-  static List<Widget> _screens = <Widget>[StatisticsFragment(), Register()];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          unselectedItemColor: Colors.white,
-          backgroundColor: Colors.black,
-          selectedItemColor: Colors.green,
-          onTap: (value) {
-            // Respond to item press.
-            setState(() => _selectedIndex = value);
-          },
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.stacked_bar_chart),
-              label: 'Statistics',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.fingerprint),
-              label: 'Register',
-            ),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ReadTagIdFragment(
+                child: RetreiveUserFragment(
+              successChild: const StatisticsFragment(),
+              failedChild: const RegistrationFragment(),
+            ))
           ],
         ),
-        body: _screens.elementAt(_selectedIndex));
+      ),
+    );
   }
 }
