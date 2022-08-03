@@ -51,6 +51,17 @@ class _MainPageState extends State<MainPage> {
             ),
             Text(widget.title)
           ]),
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: IconButton(
+                  onPressed: () => context.read<UserModel>().resetId(),
+                  icon: Icon(
+                    Icons.logout_outlined,
+                    size: 26.0,
+                  ),
+                )),
+          ],
         ),
         body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
