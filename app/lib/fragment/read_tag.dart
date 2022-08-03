@@ -16,7 +16,7 @@ class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
   Future<NFCAvailability> retrieveId(UserModel model) async {
     var status = await FlutterNfcKit.nfcAvailability;
     if (status == NFCAvailability.available) {
-      final NFCTag tag = await FlutterNfcKit.poll();
+      final NFCTag tag =  await FlutterNfcKit.poll();
       model.tokenId = tag.id;
     }
 

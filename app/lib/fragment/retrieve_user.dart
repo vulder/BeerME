@@ -67,7 +67,7 @@ class _RetreiveUserFragmentState extends State<RetreiveUserFragment> {
                   padding: const EdgeInsets.only(top: 16),
                   child: ElevatedButton(
                       child: Row(
-                        children: const [Icon(Icons.refresh), Text('Refresh')],
+                        children: const [Icon(Icons.refresh), Text('Retry')],
                       ),
                       onPressed: () => setState(() {})))
             ]);
