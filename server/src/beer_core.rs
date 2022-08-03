@@ -7,14 +7,13 @@ use std::{env, io};
 use actix_web::{middleware, web, App, HttpServer};
 
 pub mod app_controller;
-mod beerer;
 pub mod config;
 mod constants;
 mod database;
 pub mod dtos;
 pub mod entities;
 mod errors;
-mod reader_controller;
+pub mod reader_controller;
 mod rfid_service;
 mod user_service;
 
@@ -47,8 +46,6 @@ pub async fn run() -> io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(pool.clone()))
-            .service(beerer::beer)
-            .service(beerer::create)
             .service(reader_controller::take_beer)
             .service(app_controller::create_user)
             .service(app_controller::user_info)
