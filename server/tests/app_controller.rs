@@ -4,7 +4,7 @@ pub mod test_utils;
 mod tests {
     use crate::test_utils::get_testing_config;
 
-    use actix_web::{test, web, App, http::StatusCode};
+    use actix_web::{http::StatusCode, test, web, App};
     use beer_core::entities::User;
     use tokio_postgres::NoTls;
 
@@ -26,11 +26,14 @@ mod tests {
 
         assert!(req.status().is_success(), "Failed to request user");
         let user: User = test::read_body_json(req).await;
-        assert_eq!("aa981764-76f7-4098-9cc6-525473dec7aa" , user.uuid, "Missmatch of uuid");
-        assert_eq!("A" , user.first_name, "Missmatch of first_name");
-        assert_eq!("a" , user.last_name, "Missmatch of last_name");
-        assert_eq!("a@a.com" , user.email, "Missmatch of email");
-        assert_eq!("AAAAAAAA" , user.token, "Missmatch of token");
+        assert_eq!(
+            "aa981764-76f7-4098-9cc6-525473dec7aa", user.uuid,
+            "Missmatch of uuid"
+        );
+        assert_eq!("A", user.first_name, "Missmatch of first_name");
+        assert_eq!("a", user.last_name, "Missmatch of last_name");
+        assert_eq!("a@a.com", user.email, "Missmatch of email");
+        assert_eq!("AAAAAAAA", user.token, "Missmatch of token");
     }
 
     #[actix_web::test]
@@ -49,6 +52,10 @@ mod tests {
             .send_request(&app)
             .await;
 
-        assert_eq!(req.status(), StatusCode::NOT_FOUND, "Server did not reject unknown user");
+        assert_eq!(
+            req.status(),
+            StatusCode::NOT_FOUND,
+            "Server did not reject unknown user"
+        );
     }
 }

@@ -84,7 +84,6 @@ pub async fn beer_brands(db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
     let brand_list = rfid_service::beer_brands(&client).await;
 
     Ok(HttpResponse::Ok()
-       .content_type(APPLICATION_JSON)
-       .json(brand_list)
-    )
+        .content_type(APPLICATION_JSON)
+        .json(brand_list))
 }

@@ -7,14 +7,14 @@ use std::{env, io};
 use actix_web::{middleware, web, App, HttpServer};
 
 pub mod app_controller;
-mod reader_controller;
 mod beerer;
 pub mod config;
 mod constants;
-pub mod entities;
 mod database;
 pub mod dtos;
+pub mod entities;
 mod errors;
+mod reader_controller;
 mod rfid_service;
 mod user_service;
 

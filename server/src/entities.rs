@@ -127,8 +127,7 @@ impl fmt::Display for BeerBrandEntry {
         writeln!(
             f,
             "BeerBrandEntry{{ beer_brand: {}, beer_type: {} }}",
-            self.beer_brand,
-            self.beer_type,
+            self.beer_brand, self.beer_type,
         )
     }
 }

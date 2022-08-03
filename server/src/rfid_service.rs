@@ -1,5 +1,5 @@
-use crate::entities::{BeerEntry, BeerBrandEntry, User, UserToken};
 use crate::dtos::BeerSummary;
+use crate::entities::{BeerBrandEntry, BeerEntry, User, UserToken};
 use crate::user_service;
 use deadpool_postgres::Client;
 
