@@ -25,11 +25,11 @@ class _RegisterState extends State<Register> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ReadTagIdFragment(child: RegistrationFragment()),
-            //     child: RetreiveUserFragment(
-            //   successChild: StatisticsFragment(),
-            //   failedChild: RegistrationFragment(),
-            // ))
+            ReadTagIdFragment(
+                child: RetreiveUserFragment(
+              successChild: StatisticsFragment(),
+              failedChild: RegistrationFragment(),
+            ))
           ],
         ),
       ),
