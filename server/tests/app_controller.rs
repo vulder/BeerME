@@ -6,10 +6,38 @@ mod tests {
 
     use actix_web::{http::StatusCode, test, web, App};
     use beer_core::{
-        dtos::BeerSummary,
+        dtos::{BeerSummary, CreateUserRequest},
         entities::{BeerBrandEntry, User},
     };
     use tokio_postgres::NoTls;
+
+    #[actix_web::test]
+    async fn test_create_existing_user() {
+        let config = get_testing_config();
+        let pool = config.pg.create_pool(None, NoTls).unwrap();
+        let app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(pool.clone()))
+                .service(beer_core::app_controller::create_user),
+        )
+        .await;
+
+        let request_data: CreateUserRequest = serde_json::from_str(
+            r#"{"first_name": "A", "last_name": "a", "email": "a@a.com", "token": "AAAAAAAA"}"#,
+        )
+        .unwrap();
+        let req = test::TestRequest::post()
+            .uri("/users")
+            .set_json(request_data)
+            .send_request(&app)
+            .await;
+
+        assert_eq!(
+            req.status(),
+            StatusCode::CONFLICT,
+            "Server did not reject creation of an existing user"
+        );
+    }
 
     #[actix_web::test]
     async fn test_get_user_by_token() {
