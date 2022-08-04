@@ -23,7 +23,8 @@ class _SignUpFragmentState extends State<SignUpFragment> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Column(children: const [
+      return Center(
+          child: Column(children: const [
         SizedBox(
           width: 60,
           height: 60,
@@ -33,7 +34,7 @@ class _SignUpFragmentState extends State<SignUpFragment> {
           padding: EdgeInsets.only(top: 16),
           child: Text('Sign-up in progress ...'),
         )
-      ]);
+      ]));
     }
 
     return Center(
@@ -81,21 +82,23 @@ class _SignUpFragmentState extends State<SignUpFragment> {
       };
 
       await widget.onSubmit(formData);
-      setState(() => _isLoading = false);
     }
+    setState(() => _isLoading = false);
   }
 
   String? validateText(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter some text';
     }
+
     return null;
   }
 
   String? validateMail(String? value) {
-    if (value == null || value.isEmpty || EmailValidator.validate(value)) {
+    if (value == null || value.isEmpty || !EmailValidator.validate(value)) {
       return 'Please enter a valid mail';
     }
+
     return null;
   }
 }

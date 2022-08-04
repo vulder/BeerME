@@ -29,6 +29,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_hasError) {
+      return Column(children: [
+        const Icon(
+          Icons.error_outline,
+          color: Colors.red,
+          size: 60,
+        ),
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text('Registratoin failed.'),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+                onPressed: () => setState(() => _hasError = false)))
+      ]);
+    }
+
     if (_tokenId == null) {
       return ReadTagIdFragment(
           onSuccess: (NFCTag? tag) => setState(() {
@@ -42,27 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         onSubmit: (formData) =>
             registerUser(formData, context.read<UserModel>()),
       );
-    }
-
-    if (_hasError) {
-      return Column(children: [
-        const Icon(
-          Icons.error_outline,
-          color: Colors.red,
-          size: 60,
-        ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('User data retrieval failed.'),
-        ),
-        Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: ElevatedButton(
-                child: Row(
-                  children: const [Icon(Icons.refresh), Text('Refresh')],
-                ),
-                onPressed: () => setState(() {})))
-      ]);
     }
 
     return Column(children: const [
@@ -109,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   registerUser(
       final Map<String, String> formData, final UserModel model) async {
     try {
-      var response = await Api.registerUser(_sanitizeToken(_tokenId));
+      var response = await Api.registerUser(CreateUserDto.fromJson(formData));
       if (response.statusCode == 200) {
         setState(() {
           var user = UserDto.fromJson(jsonDecode(response.body));
