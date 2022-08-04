@@ -76,6 +76,34 @@ mod tests {
     }
 
     #[actix_web::test]
+    async fn test_create_existing_user_duplicate() {
+        let config = get_testing_config();
+        let pool = config.pg.create_pool(None, NoTls).unwrap();
+        let app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(pool.clone()))
+                .service(beer_core::app_controller::create_user),
+        )
+        .await;
+
+        let request_data: CreateUserRequest = serde_json::from_str(
+            r#"{"first_name": "New", "last_name": "boy", "email": "a@a.com", "token": "BAAAAAAA"}"#,
+        )
+        .unwrap();
+        let req = test::TestRequest::post()
+            .uri("/users")
+            .set_json(request_data)
+            .send_request(&app)
+            .await;
+
+        assert_eq!(
+            req.status(),
+            StatusCode::CONFLICT,
+            "Server did not reject creation of duplicate user"
+        );
+    }
+
+    #[actix_web::test]
     async fn test_get_user_by_token() {
         let config = get_testing_config();
         let pool = config.pg.create_pool(None, NoTls).unwrap();

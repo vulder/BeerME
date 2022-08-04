@@ -27,7 +27,12 @@ pub async fn create_user(
                     .finish())
             } else {
                 let created_user = user_service::create_user(&client, user).await;
-                Ok(HttpResponse::Created().json(created_user))
+                match &created_user {
+                    Some(user) => Ok(HttpResponse::Created().json(user)),
+                    None => Ok(HttpResponse::Conflict()
+                        .reason("User already exists")
+                        .finish()),
+                }
             }
         }
         None => Ok(HttpResponse::BadRequest()

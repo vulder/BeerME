@@ -3,8 +3,15 @@ use deadpool_postgres::Client;
 use crate::database;
 use crate::entities::{User, UserToken};
 
-pub async fn create_user(client: &Client, user: &User) -> User {
-    database::create_user(client, user).await.unwrap()
+pub async fn create_user(client: &Client, user: &User) -> Option<User> {
+    let maybe_user = database::create_user(client, user).await;
+    match maybe_user {
+        Ok(user) => Some(user),
+        Err(error) => {
+            log::debug!("Error: {}", error);
+            None
+        }
+    }
 }
 
 pub async fn delete_user(client: &Client, user: &User) -> bool {
