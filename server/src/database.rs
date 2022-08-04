@@ -66,13 +66,7 @@ pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyErr
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
-        .query(
-            &stmt,
-            &[
-                &beer.time,
-                &beer.uuid,
-            ],
-        )
+        .query(&stmt, &[&beer.time, &beer.uuid])
         .await?
         .pop()
         .map(|x| x.get(0))
@@ -87,7 +81,7 @@ pub async fn get_last_beer_of_user(client: &Client, user: &User) -> Result<BeerE
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
-        .query(&stmt, &[&user.uuid,],)
+        .query(&stmt, &[&user.uuid])
         .await?
         .pop()
         .map(|row| BeerEntry::from_row_ref(&row).unwrap())
