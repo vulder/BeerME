@@ -1,32 +1,89 @@
 import 'dart:convert';
 
-import 'package:app/api.dart';
-import 'package:app/model/user.dart';
 import 'package:flutter/material.dart';
-import 'package:app/dto/user.dart';
-import 'package:http/http.dart';
-
-import 'package:provider/provider.dart';
+import 'package:email_validator/email_validator.dart';
 
 class SignUpFragment extends StatefulWidget {
-  String tokenId;
+  Function(Map<String, String> formData) onSubmit;
 
-  SignUpFragment({Key? key, required this.tokenId}) : super(key: key);
+  SignUpFragment({Key? key, required this.onSubmit}) : super(key: key);
 
   @override
   State<SignUpFragment> createState() => _SignUpFragmentState();
 }
 
-enum Status { none, loading, success, failed }
-
 class _SignUpFragmentState extends State<SignUpFragment> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final firstName = TextEditingController();
-  final lastName = TextEditingController();
-  final email = TextEditingController();
+  bool _isLoading = false;
 
-  Status status = Status.none;
-  UserDto? user;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _firstName = TextEditingController();
+  final _lastName = TextEditingController();
+  final _email = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Column(children: const [
+        SizedBox(
+          width: 60,
+          height: 60,
+          child: CircularProgressIndicator(),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Text('Sign-up in progress ...'),
+        )
+      ]);
+    }
+
+    return Center(
+        child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                    controller: _firstName,
+                    decoration: const InputDecoration(
+                      hintText: 'First Name',
+                    ),
+                    validator: validateText),
+                TextFormField(
+                    controller: _lastName,
+                    decoration: const InputDecoration(
+                      hintText: 'Last Name',
+                    ),
+                    validator: validateText),
+                TextFormField(
+                    controller: _email,
+                    decoration: const InputDecoration(
+                      hintText: 'E-Mail',
+                    ),
+                    validator: validateMail),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: ElevatedButton(
+                    onPressed: submit,
+                    child: const Text('Register'),
+                  ),
+                ),
+              ],
+            )));
+  }
+
+  submit() async {
+    setState(() => _isLoading = true);
+    if (_formKey.currentState!.validate()) {
+      var formData = {
+        "first_name": _firstName.text,
+        "last_name": _lastName.text,
+        "email": _email.text
+      };
+
+      await widget.onSubmit(formData);
+      setState(() => _isLoading = false);
+    }
+  }
 
   String? validateText(String? value) {
     if (value == null || value.isEmpty) {
@@ -35,105 +92,10 @@ class _SignUpFragmentState extends State<SignUpFragment> {
     return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    switch (status) {
-      case Status.loading:
-        return Column(children: const [
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: CircularProgressIndicator(),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: Text('Sign-up user in progress ...'),
-          )
-        ]);
-      case Status.success:
-        return Column(children: [
-          const Icon(
-            Icons.check,
-            color: Colors.green,
-            size: 60,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text('Hello ${user?.first_name} ${user?.last_name}'),
-          ),
-        ]);
-      case Status.failed:
-        return Column(children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text('Failed to register user'),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: ElevatedButton(
-                  child: Row(
-                    children: const [Icon(Icons.refresh), Text('Retry')],
-                  ),
-                  onPressed: () => setState(() {})))
-        ]);
-      case Status.none:
-        return Center(
-            child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextFormField(
-                        controller: firstName,
-                        decoration: const InputDecoration(
-                          hintText: 'First Name',
-                        ),
-                        validator: validateText),
-                    TextFormField(
-                        controller: lastName,
-                        decoration: const InputDecoration(
-                          hintText: 'Last Name',
-                        ),
-                        validator: validateText),
-                    TextFormField(
-                        controller: email,
-                        decoration: const InputDecoration(
-                          hintText: 'E-Mail',
-                        ),
-                        validator: validateText),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() => status = Status.loading);
-                            var response = await Api.registerUser(CreateUserDto(
-                                first_name: firstName.text,
-                                last_name: lastName.text,
-                                email: email.text,
-                                token: widget.tokenId));
-                            setState(() {
-                              if (response.statusCode == 201) {
-                                status = Status.success;
-                                user =
-                                    UserDto.fromJson(jsonDecode(response.body));
-                                context.read<UserModel>().id = "${user?.uuid}";
-                              } else {
-                                status = Status.failed;
-                              }
-                            });
-                          }
-                        },
-                        child: const Text('Register'),
-                      ),
-                    ),
-                  ],
-                )));
+  String? validateMail(String? value) {
+    if (value == null || value.isEmpty || EmailValidator.validate(value)) {
+      return 'Please enter a valid mail';
     }
+    return null;
   }
 }

@@ -1,6 +1,3 @@
-import 'package:app/dto/user.dart';
-import 'package:app/fragment/read_tag.dart';
-import 'package:app/fragment/register_form.dart';
 import 'package:app/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

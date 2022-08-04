@@ -38,7 +38,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (_userNotFound) {
-      return SignUpFragment(tokenId: _tokenId!);
+      return SignUpFragment(
+        onSubmit: (formData) =>
+            registerUser(formData, context.read<UserModel>()),
+      );
     }
 
     if (_hasError) {
@@ -94,6 +97,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else if (response.statusCode == 404) {
         setState(() {
           _userNotFound = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+      });
+    }
+  }
+
+  registerUser(
+      final Map<String, String> formData, final UserModel model) async {
+    try {
+      var response = await Api.registerUser(_sanitizeToken(_tokenId));
+      if (response.statusCode == 200) {
+        setState(() {
+          var user = UserDto.fromJson(jsonDecode(response.body));
+          model.id = user.uuid;
+        });
+      } else {
+        setState(() {
+          _hasError = true;
         });
       }
     } catch (e) {
