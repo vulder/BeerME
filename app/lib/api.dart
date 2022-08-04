@@ -17,10 +17,12 @@ class Api {
   }
 
   static Future<Response> retrieveUser(final String tokenId) {
-    return get(Uri.http(host, "/tokens/${tokenId}/user"));
+    return get(Uri.http(host, "/tokens/${tokenId}/user"))
+        .timeout(const Duration(seconds: 10));
   }
 
   static Future<Response> retrieveStatistics(final String userId) {
-    return get(Uri.http(host, "/users/${userId}/beers/summary"));
+    return get(Uri.http(host, "/users/${userId}/beers/summary"))
+        .timeout(const Duration(seconds: 10));
   }
 }

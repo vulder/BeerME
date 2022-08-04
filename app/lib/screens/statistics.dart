@@ -70,39 +70,37 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   )
                 ];
 
-                return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GridView.builder(
-                        itemCount: elements.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisSpacing: 15,
-                                childAspectRatio: 1,
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 20),
-                        itemBuilder: (context, index) {
-                          return ElementWidget(element: elements[index]);
-                        },
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: ElementWidget(
-                            element: Element(
-                                title: "Unpaid",
-                                number: statistics.unpaid,
-                                color: Color(0xFF805b10),
-                                accent: Color(0xFF76520e)),
-                          )),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: IconButton(
-                              icon: const Icon(Icons.refresh),
-                              tooltip: 'Refresh',
-                              onPressed: () => setState(() {})))
-                    ]);
+                return Column(children: <Widget>[
+                  GridView.builder(
+                    itemCount: elements.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 15,
+                            childAspectRatio: 1,
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 20),
+                    itemBuilder: (context, index) {
+                      return ElementWidget(element: elements[index]);
+                    },
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: ElementWidget(
+                        element: Element(
+                            title: "Unpaid",
+                            number: statistics.unpaid,
+                            color: Color(0xFF805b10),
+                            accent: Color(0xFF76520e)),
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Refresh',
+                          onPressed: () => setState(() {})))
+                ]);
               } else {
                 return Column(children: [
                   const Icon(

@@ -3,17 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 
-class SignUpFragment extends StatefulWidget {
+class SignUpFragment extends StatelessWidget {
   Function(Map<String, String> formData) onSubmit;
 
   SignUpFragment({Key? key, required this.onSubmit}) : super(key: key);
-
-  @override
-  State<SignUpFragment> createState() => _SignUpFragmentState();
-}
-
-class _SignUpFragmentState extends State<SignUpFragment> {
-  bool _isLoading = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _firstName = TextEditingController();
@@ -22,26 +15,10 @@ class _SignUpFragmentState extends State<SignUpFragment> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Center(
-          child: Column(children: const [
-        SizedBox(
-          width: 60,
-          height: 60,
-          child: CircularProgressIndicator(),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text('Sign-up in progress ...'),
-        )
-      ]));
-    }
-
     return Center(
         child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextFormField(
                     controller: _firstName,
@@ -73,7 +50,6 @@ class _SignUpFragmentState extends State<SignUpFragment> {
   }
 
   submit() async {
-    setState(() => _isLoading = true);
     if (_formKey.currentState!.validate()) {
       var formData = {
         "first_name": _firstName.text,
@@ -81,9 +57,8 @@ class _SignUpFragmentState extends State<SignUpFragment> {
         "email": _email.text
       };
 
-      await widget.onSubmit(formData);
+      await onSubmit(formData);
     }
-    setState(() => _isLoading = false);
   }
 
   String? validateText(String? value) {

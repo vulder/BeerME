@@ -1,5 +1,5 @@
 name: app
-description: A beer counter app.
+description: Hey you, beer me!
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.

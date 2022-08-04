@@ -17,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  bool _isLoading = false;
   bool _hasError = false;
   bool _userNotFound = false;
   String? _tokenId;
@@ -30,31 +31,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     if (_hasError) {
-      return Column(children: [
-        const Icon(
-          Icons.error_outline,
-          color: Colors.red,
-          size: 60,
-        ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('Registratoin failed.'),
-        ),
-        Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-                onPressed: () => setState(() => _hasError = false)))
-      ]);
-    }
-
-    if (_tokenId == null) {
-      return ReadTagIdFragment(
-          onSuccess: (NFCTag? tag) => setState(() {
-                _tokenId = tag?.id;
-                retrieveUser(context.read<UserModel>());
-              }));
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Failed to process registration.'),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                    onPressed: () => setState(() => _hasError = false)))
+          ]);
     }
 
     if (_userNotFound) {
@@ -64,17 +60,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     }
 
-    return Column(children: const [
-      SizedBox(
-        width: 60,
-        height: 60,
-        child: CircularProgressIndicator(),
-      ),
-      Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: Text('Retrieving user data ...'),
-      )
-    ]);
+    if (_isLoading) {
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Processing data ...'),
+            )
+          ]);
+    }
+
+    return ReadTagIdFragment(
+        onSuccess: (NFCTag? tag) => setState(() {
+              _tokenId = tag?.id;
+              retrieveUser(context.read<UserModel>());
+            }));
   }
 
   _sanitizeToken(String? token) {
@@ -86,35 +93,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
     try {
       var response = await Api.retrieveUser(_sanitizeToken(_tokenId));
       if (response.statusCode == 200) {
         setState(() {
           var user = UserDto.fromJson(jsonDecode(response.body));
           model.id = user.uuid;
+          _isLoading = false;
         });
       } else if (response.statusCode == 404) {
         setState(() {
           _userNotFound = true;
+          _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
         _hasError = true;
+        _isLoading = false;
       });
     }
   }
 
   registerUser(
       final Map<String, String> formData, final UserModel model) async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       var newUser = CreateUserDto(
-      first_name: formData['first_name']!,
-      last_name: formData['last_name']!,
-      email: formData['email']!,
-      token: _tokenId!
-    );
-
+          first_name: formData['first_name']!,
+          last_name: formData['last_name']!,
+          email: formData['email']!,
+          token: _tokenId!);
       var response = await Api.registerUser(newUser);
       if (response.statusCode == 201) {
         setState(() {
@@ -124,11 +138,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         setState(() {
           _hasError = true;
+          _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
         _hasError = true;
+        _isLoading = false;
       });
     }
   }

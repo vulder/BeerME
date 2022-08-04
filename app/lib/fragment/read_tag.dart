@@ -67,16 +67,19 @@ class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
   @override
   Widget build(BuildContext context) {
     if (_isPolling) {
-      return Column(children: const [
-        Icon(
-          Icons.sensors,
-          size: 80,
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 16),
-          child: Text("Hold token near phone ..."),
-        )
-      ]);
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.sensors,
+              size: 80,
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text("Hold token near phone ..."),
+            )
+          ]);
     }
 
     if (_hasError) {
@@ -119,17 +122,19 @@ class _ReadTagIdFragmentState extends State<ReadTagIdFragment> {
       ]);
     }
 
-    return ButtonTheme(
-      minWidth: 200.0,
-      height: 100.0,
-      child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            onPrimary: Theme.of(context).colorScheme.onPrimary,
-            primary: Theme.of(context).colorScheme.primary,
-          ),
-          icon: const Icon(Icons.sensors),
-          label: const Text('Register Token'),
-          onPressed: () => read().then((value) => widget.onSuccess(value))),
-    );
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(80),
+                  onPrimary: Theme.of(context).colorScheme.onPrimary,
+                  primary: Theme.of(context).colorScheme.primary,
+                  textStyle: const TextStyle(fontSize: 20)),
+              icon: const Icon(Icons.sensors),
+              label: const Text('Click to register token'),
+              onPressed: () => read().then((value) => widget.onSuccess(value)))
+        ]);
   }
 }

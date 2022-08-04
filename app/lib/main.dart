@@ -49,32 +49,26 @@ class _MainPageState extends State<MainPage> {
             Text(widget.title)
           ]),
           actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: () => context.read<UserModel>().resetId(),
-                  child: Icon(
-                    Icons.logout_outlined,
-                    size: 26.0,
-                  ),
-                )),
+            if (context.read<UserModel>().hasId()) ...[
+              Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                    onTap: () => context.read<UserModel>().resetId(),
+                    child: const Icon(
+                      Icons.logout_outlined,
+                      size: 26.0,
+                    ),
+                  )),
+            ]
           ],
         ),
-        body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Provider.of<UserModel>(context).hasId()
-                        ? const StatisticsScreen()
-                        : RegisterScreen(),
-                  ],
-                ),
-              ),
-            )));
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+          child: Center(
+            child: Provider.of<UserModel>(context).hasId()
+                ? const StatisticsScreen()
+                : RegisterScreen(),
+          ),
+        ));
   }
 }
