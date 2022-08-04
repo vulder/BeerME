@@ -12,10 +12,10 @@ mod constants;
 mod database;
 pub mod dtos;
 pub mod entities;
-mod errors;
+pub mod errors;
 pub mod reader_controller;
-mod rfid_service;
-mod user_service;
+pub mod rfid_service;
+pub mod user_service;
 
 use crate::config::ServerConfig;
 use ::config::Config;
