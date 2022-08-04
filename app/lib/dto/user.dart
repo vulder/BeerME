@@ -55,13 +55,4 @@ class CreateUserDto {
       'token': token,
     };
   }
-
-  static CreateUserDto fromJson(Map<String, dynamic> json) {
-    return CreateUserDto(
-      first_name: json['first_name'],
-      last_name: json['last_name'],
-      email: json['email'],
-      token: json['token'],
-    );
-  }
 }
