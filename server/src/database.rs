@@ -42,6 +42,19 @@ pub async fn create_user(client: &Client, user: &User) -> Result<User, MyError> 
         .ok_or(MyError::NotFound)
 }
 
+pub async fn delete_user(client: &Client, user: &User) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/delete_user.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid])
+        .await?
+        .pop()
+        .map(|x| x.get(0))
+        .or_else(|| Some(false))
+        .ok_or(MyError::NotFound)
+}
+
 pub async fn register_taken_beer(
     client: &Client,
     beer_entry: BeerEntry,

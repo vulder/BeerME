@@ -4,9 +4,9 @@ use actix_web::{Error, HttpResponse};
 use crate::constants::APPLICATION_JSON;
 use deadpool_postgres::{Client, Pool};
 
+use crate::beer_service;
 use crate::dtos::{BeerRequest, BeerResponse};
 use crate::errors::MyError;
-use crate::beer_service;
 
 #[post("/tokens/{token_id}/beer")]
 pub async fn take_beer(

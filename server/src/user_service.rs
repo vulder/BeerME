@@ -7,6 +7,10 @@ pub async fn create_user(client: &Client, user: &User) -> User {
     database::create_user(client, user).await.unwrap()
 }
 
+pub async fn delete_user(client: &Client, user: &User) -> bool {
+    database::delete_user(client, user).await.unwrap()
+}
+
 pub async fn get_user(client: &Client, user_token: &UserToken) -> Option<User> {
     database::get_users(client)
         .await

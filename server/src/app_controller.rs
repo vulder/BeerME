@@ -6,9 +6,9 @@ use deadpool_postgres::{Client, Pool};
 
 use crate::dtos::CreateUserRequest;
 
+use crate::beer_service;
 use crate::entities::UserToken;
 use crate::errors::MyError;
-use crate::beer_service;
 use crate::user_service;
 
 #[post("/users")]

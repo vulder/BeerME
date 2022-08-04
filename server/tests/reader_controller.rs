@@ -92,7 +92,7 @@ mod tests {
         let resp: BeerResponse = test::read_body_json(req).await;
         assert!(resp.valid, "User was valid to register a new beer");
 
-        // Clean up
+        // Clean up created beer
         let client: Client = pool.get().await.map_err(MyError::PoolError).unwrap();
         let user = beer_core::user_service::get_user(
             &client,
