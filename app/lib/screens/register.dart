@@ -109,13 +109,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final Map<String, String> formData, final UserModel model) async {
     try {
       var newUser = CreateUserDto(
-          first_name: formData['first_name']!,
-          last_name: formData['last_name']!,
-          email: formData['email']!,
-          token: _tokenId!);
+      first_name: formData['first_name']!,
+      last_name: formData['last_name']!,
+      email: formData['email']!,
+      token: _tokenId!
+    );
 
       var response = await Api.registerUser(newUser);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         setState(() {
           var user = UserDto.fromJson(jsonDecode(response.body));
           model.id = user.uuid;
