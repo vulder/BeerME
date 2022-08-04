@@ -8,7 +8,7 @@ use crate::dtos::CreateUserRequest;
 
 use crate::entities::UserToken;
 use crate::errors::MyError;
-use crate::rfid_service;
+use crate::beer_service;
 use crate::user_service;
 
 #[post("/users")]
@@ -21,7 +21,7 @@ pub async fn create_user(
     match &maybe_user {
         Some(user) => {
             let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-            if rfid_service::is_token_registered(&client, &user.get_token()).await {
+            if beer_service::is_token_registered(&client, &user.get_token()).await {
                 Ok(HttpResponse::Conflict()
                     .reason("Token was already registered")
                     .finish())
@@ -67,7 +67,7 @@ pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
 
     match &maybe_user {
         Some(user) => {
-            let beer_summary = rfid_service::calculate_beer_summary(&client, user).await;
+            let beer_summary = beer_service::calculate_beer_summary(&client, user).await;
             Ok(HttpResponse::Ok()
                 .content_type(APPLICATION_JSON)
                 .json(beer_summary))
@@ -81,7 +81,7 @@ pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
 #[get("/beers/brands")]
 pub async fn beer_brands(db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let brand_list = rfid_service::beer_brands(&client).await;
+    let brand_list = beer_service::beer_brands(&client).await;
 
     Ok(HttpResponse::Ok()
         .content_type(APPLICATION_JSON)

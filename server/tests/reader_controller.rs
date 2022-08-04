@@ -100,6 +100,6 @@ mod tests {
         )
         .await
         .unwrap();
-        beer_core::rfid_service::delete_last_beer_of_user(&client, &user).await;
+        beer_core::beer_service::delete_last_beer_of_user(&client, &user).await;
     }
 }

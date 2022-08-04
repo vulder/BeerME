@@ -14,7 +14,7 @@ pub mod dtos;
 pub mod entities;
 pub mod errors;
 pub mod reader_controller;
-pub mod rfid_service;
+pub mod beer_service;
 pub mod user_service;
 
 use crate::config::ServerConfig;

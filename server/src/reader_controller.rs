@@ -6,7 +6,7 @@ use deadpool_postgres::{Client, Pool};
 
 use crate::dtos::{BeerRequest, BeerResponse};
 use crate::errors::MyError;
-use crate::rfid_service;
+use crate::beer_service;
 
 #[post("/tokens/{token_id}/beer")]
 pub async fn take_beer(
@@ -21,8 +21,8 @@ pub async fn take_beer(
         Some(token) => {
             let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
             let mut response = BeerResponse { valid: false };
-            if rfid_service::is_token_registered(&client, token).await {
-                let success = rfid_service::register_taken_beer(&client, token);
+            if beer_service::is_token_registered(&client, token).await {
+                let success = beer_service::register_taken_beer(&client, token);
                 if !success.await {
                     return Ok(HttpResponse::InternalServerError()
                         .reason("Could not register taken beer")
