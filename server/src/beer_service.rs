@@ -33,6 +33,19 @@ pub async fn register_taken_beer(client: &Client, user_token: &UserToken) -> boo
     }
 }
 
+pub async fn delete_beer(client: &Client, beer: BeerEntry) -> bool {
+    database::delete_beer(client, beer).await.unwrap()
+}
+
+pub async fn delete_last_beer_of_user(client: &Client, user: &User) -> bool {
+    let last_beer = get_last_beer_of_user(client, user).await;
+    delete_beer(client, last_beer).await
+}
+
+pub async fn get_last_beer_of_user(client: &Client, user: &User) -> BeerEntry {
+    database::get_last_beer_of_user(client, user).await.unwrap()
+}
+
 pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary {
     let user_beer_entries = database::beer_entries_for_user(client, user).await;
 

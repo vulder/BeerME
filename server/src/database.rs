@@ -42,13 +42,25 @@ pub async fn create_user(client: &Client, user: &User) -> Result<User, MyError> 
         .ok_or(MyError::NotFound)
 }
 
+pub async fn delete_user(client: &Client, user: &User) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/delete_user.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid])
+        .await?
+        .pop()
+        .map(|x| x.get(0))
+        .or_else(|| Some(false))
+        .ok_or(MyError::NotFound)
+}
+
 pub async fn register_taken_beer(
     client: &Client,
     beer_entry: BeerEntry,
 ) -> Result<BeerEntry, MyError> {
     let _stmt = include_str!("sql/register_beer_taken.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
-
     client
         .query(
             &stmt,
@@ -59,6 +71,33 @@ pub async fn register_taken_beer(
         .map(|row| BeerEntry::from_row_ref(row).unwrap())
         .collect::<Vec<BeerEntry>>()
         .pop()
+        .ok_or(MyError::NotFound)
+}
+
+pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/delete_beer.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&beer.time, &beer.uuid])
+        .await?
+        .pop()
+        .map(|x| x.get(0))
+        .or_else(|| Some(false))
+        .ok_or(MyError::NotFound)
+}
+
+pub async fn get_last_beer_of_user(client: &Client, user: &User) -> Result<BeerEntry, MyError> {
+    let _stmt = include_str!("sql/get_last_beer_of_user.sql");
+    let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let _stmt = _stmt.replace("beers.beer_brand", "beer_brands.beer_brand");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid])
+        .await?
+        .pop()
+        .map(|row| BeerEntry::from_row_ref(&row).unwrap())
         .ok_or(MyError::NotFound)
 }
 

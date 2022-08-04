@@ -3,13 +3,49 @@ pub mod test_utils;
 #[cfg(test)]
 mod tests {
     use crate::test_utils::get_testing_config;
+    use beer_core::errors::MyError;
+    use deadpool_postgres::Client;
 
     use actix_web::{http::StatusCode, test, web, App};
     use beer_core::{
         dtos::{BeerSummary, CreateUserRequest},
         entities::{BeerBrandEntry, User},
+        user_service,
     };
     use tokio_postgres::NoTls;
+
+    #[actix_web::test]
+    async fn test_create_new_user() {
+        let config = get_testing_config();
+        let pool = config.pg.create_pool(None, NoTls).unwrap();
+        let app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(pool.clone()))
+                .service(beer_core::app_controller::create_user),
+        )
+        .await;
+
+        let request_data: CreateUserRequest = serde_json::from_str(
+            r#"{"first_name": "NewFirst", "last_name": "UserLast", "email": "new@user.com", "token": "11111111"}"#,
+        )
+        .unwrap();
+        let req = test::TestRequest::post()
+            .uri("/users")
+            .set_json(request_data)
+            .send_request(&app)
+            .await;
+
+        assert!(req.status().is_success(), "Failed to create user");
+        let user: User = test::read_body_json(req).await;
+        assert_eq!("NewFirst", user.first_name, "Missmatch of first_name");
+        assert_eq!("UserLast", user.last_name, "Missmatch of last_name");
+        assert_eq!("new@user.com", user.email, "Missmatch of email");
+        assert_eq!("11111111", user.token, "Missmatch of token");
+
+        // Clean up created user
+        let client: Client = pool.get().await.map_err(MyError::PoolError).unwrap();
+        user_service::delete_user(&client, &user).await;
+    }
 
     #[actix_web::test]
     async fn test_create_existing_user() {

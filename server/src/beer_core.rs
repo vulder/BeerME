@@ -7,15 +7,15 @@ use std::{env, io};
 use actix_web::{middleware, web, App, HttpServer};
 
 pub mod app_controller;
+pub mod beer_service;
 pub mod config;
 mod constants;
 mod database;
 pub mod dtos;
 pub mod entities;
-mod errors;
+pub mod errors;
 pub mod reader_controller;
-mod rfid_service;
-mod user_service;
+pub mod user_service;
 
 use crate::config::ServerConfig;
 use ::config::Config;
