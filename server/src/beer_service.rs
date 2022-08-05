@@ -66,7 +66,7 @@ pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary
         count.today,
         count.week,
         count.month,
-        count.today,
+        count.total,
         unpaid,
         recent_beers,
         fav_beer,
