@@ -52,19 +52,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
                   Element(
                     title: "Week",
-                    number: statistics.today,
+                    number: statistics.week,
                     color: Color(0xFFedc531),
                     accent: Color(0xFFdbb42c),
                   ),
                   Element(
                     title: "Month",
-                    number: statistics.today,
+                    number: statistics.month,
                     color: Color(0xFFc9a227),
                     accent: Color(0xFFb69121),
                   ),
                   Element(
                     title: "Total",
-                    number: statistics.today,
+                    number: statistics.total,
                     color: Color(0xFFa47e1b),
                     accent: Color(0xFF926c15),
                   )
