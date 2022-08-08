@@ -83,6 +83,28 @@ pub async fn beers_summary(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
     }
 }
 
+#[get("/users/{user_id}/beers/payments")]
+pub async fn pay_all_beers(path: Path<String>, db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user_uuid = path.into_inner();
+    let maybe_user = user_service::get_user_from_uuid(&client, user_uuid).await;
+
+    match &maybe_user {
+        Some(user) => {
+            if beer_service::mark_all_beers_payed(&client, user).await {
+                Ok(HttpResponse::Ok()
+                    .finish())
+            } else {
+                Ok(HttpResponse::InternalServerError()
+                    .finish())
+            }
+        }
+        None => Ok(HttpResponse::NotFound()
+            .reason("User was not registered in the system")
+            .finish()),
+    }
+}
+
 #[get("/beers/brands")]
 pub async fn beer_brands(db_pool: Data<Pool>) -> Result<HttpResponse, Error> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;

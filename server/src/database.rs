@@ -80,6 +80,18 @@ pub async fn register_taken_beer(
         .ok_or(MyError::NotFound)
 }
 
+/// Markes all beers of a user as paid.
+pub async fn mark_beers_payed_of_user(client: &Client, user: &User) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/mark_beers_paid.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid,])
+        .await
+        .map(|_| true)
+        .map_err(|err| MyError::PGError(err))
+}
+
 pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyError> {
     let _stmt = include_str!("sql/delete_beer.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
