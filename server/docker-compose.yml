@@ -1,0 +1,21 @@
+version: '3'
+services:
+  server:
+    build: .
+    environment:
+      server-addr: 0.0.0.0
+      server-port: 80
+      pg.user: root
+      pg.password: $DB_PWD
+      pg.host: db
+      pg.port: 5432
+      pg.dbname: beerme
+      pg.pool.max_size: 4
+  db:
+    image: postgres:14
+    environment:
+      pgdata: /var/lib/postgresql/data
+      postgres_password: $DB_PWD
+    volumes:
+      - ./db:/var/lib/postgresql/data
+      - ./.docker/init_db.sh:/docker-entrypoint-initdb.d/init_beerme.sh:ro
