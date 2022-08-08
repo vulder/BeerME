@@ -8,6 +8,8 @@
   └── server
 ```
 
+<img src="img/BeerMEOverview.png" width="800"/>
+
 ### App setup
 
 ### Reader setup
