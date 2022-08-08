@@ -92,11 +92,41 @@ pub async fn pay_all_beers(path: Path<String>, db_pool: Data<Pool>) -> Result<Ht
     match &maybe_user {
         Some(user) => {
             if beer_service::mark_all_beers_payed(&client, user).await {
-                Ok(HttpResponse::Ok()
-                    .finish())
+                Ok(HttpResponse::Ok().finish())
             } else {
-                Ok(HttpResponse::InternalServerError()
-                    .finish())
+                Ok(HttpResponse::InternalServerError().finish())
+            }
+        }
+        None => Ok(HttpResponse::NotFound()
+            .reason("User was not registered in the system")
+            .finish()),
+    }
+}
+
+#[get("/users/{user_id}/beers/{beer_id}/payment")]
+pub async fn pay_beer(
+    path_param: Path<(String, String)>,
+    db_pool: Data<Pool>,
+) -> Result<HttpResponse, Error> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let (user_uuid, beer_id_str) = path_param.into_inner();
+    let beer_id = match beer_id_str.parse::<i64>() {
+        Ok(beer_id) => beer_id,
+        Err(_) => {
+            return Ok(HttpResponse::BadRequest()
+                .reason("Beer ID malformed")
+                .finish())
+        }
+    };
+
+    let maybe_user = user_service::get_user_from_uuid(&client, user_uuid).await;
+
+    match &maybe_user {
+        Some(user) => {
+            if beer_service::mark_beer_paid(&client, user, beer_id).await {
+                Ok(HttpResponse::Ok().finish())
+            } else {
+                Ok(HttpResponse::InternalServerError().finish())
             }
         }
         None => Ok(HttpResponse::NotFound()

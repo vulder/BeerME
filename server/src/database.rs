@@ -86,7 +86,19 @@ pub async fn mark_beers_payed_of_user(client: &Client, user: &User) -> Result<bo
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
-        .query(&stmt, &[&user.uuid,])
+        .query(&stmt, &[&user.uuid])
+        .await
+        .map(|_| true)
+        .map_err(|err| MyError::PGError(err))
+}
+
+/// Markes specified beer as paid.
+pub async fn mark_beer_paid(client: &Client, user: &User, beer_id: i64) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/mark_beer_paid.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid, &beer_id])
         .await
         .map(|_| true)
         .map_err(|err| MyError::PGError(err))

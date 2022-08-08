@@ -50,7 +50,16 @@ pub async fn get_last_beer_of_user(client: &Client, user: &User) -> BeerEntry {
 
 /// Markes all beers of a user as paid.
 pub async fn mark_all_beers_payed(client: &Client, user: &User) -> bool {
-    database::mark_beers_payed_of_user(client, user).await.unwrap()
+    database::mark_beers_payed_of_user(client, user)
+        .await
+        .unwrap()
+}
+
+/// Marks a beer as paid.
+pub async fn mark_beer_paid(client: &Client, user: &User, beer_id: i64) -> bool {
+    database::mark_beer_paid(client, user, beer_id)
+        .await
+        .unwrap()
 }
 
 pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary {
