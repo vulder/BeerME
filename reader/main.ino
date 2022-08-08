@@ -1,7 +1,13 @@
 #include <ESP8266WiFi.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include <ESP8266HTTPClient.h>
+#include <time.h>
+#include <stdlib.h>
 
+#define SERVER_PORT "8080"
+#define SERVER_PROTOCOL "http"
+#define SERVER_IP "192.168.20.162"
 #ifndef STASSID
 #define STASSID "lan"
 #define STAPSK  "lan2022flo"
@@ -17,7 +23,17 @@ int out = 0;
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
+String baseUrl(){
+  return String(SERVER_PROTOCOL)+"://"+SERVER_IP+":"+SERVER_PORT;
+}
+
+String drinkBeerUrl(String token) {
+  return baseUrl() + "/tokens/"+token+"/beer";
+}
+
 void setup() {
+  srand(time(NULL));   // Initialization, should only be called once.
+  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
   Serial.begin(115200);
 
   // We start by connecting to a WiFi network
@@ -48,6 +64,23 @@ void setup() {
   mfrc522.PCD_Init();   // Initiate MFRC522
 }
 
+void blink(int count) {
+  blink(count, 100, 100);
+}
+
+void blink(int count, int ms) {
+  blink(count, ms, ms);
+}
+
+void blink(int count, int onMillis, int offMillis) {
+  if (count < 0) return;
+  for(int i = 0; i < count; ++i){
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(onMillis);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(offMillis);
+  }
+}
 void loop() {
    // Look for new cards
   if ( ! mfrc522.PICC_IsNewCardPresent()) 
@@ -59,6 +92,7 @@ void loop() {
   {
     return;
   }
+
   //Show UID on serial monitor
   Serial.println();
   Serial.print(" UID tag :");
@@ -66,25 +100,47 @@ void loop() {
   byte letter;
   for (byte i = 0; i < mfrc522.uid.size; i++) 
   {
-     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
      Serial.print(mfrc522.uid.uidByte[i], HEX);
-     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : ""));
      content.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
   content.toUpperCase();
   Serial.println();
-  if (content.substring(1) == "8E 39 32 50") //change UID of the card that you want to give access
-  {
-    Serial.println(" Access Granted ");
-    Serial.println(" Welcome Mr.Circuit ");
-    delay(1000);
-    Serial.println(" Have FUN ");
-    Serial.println();
-    statuss = 1;
-  }
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+    WiFiClient client;
+    HTTPClient http;
   
-  else   {
-    Serial.println(" Access Denied ");
-    delay(3000);
+    Serial.print("[HTTP] begin...\n");
+    // configure traged server and url
+    http.begin(client, drinkBeerUrl(content.substring(0))); //HTTP
+    http.addHeader("Content-Type", "application/json");
+  
+    Serial.print("[HTTP] POST...\n");
+    // start connection and send HTTP header and body
+    int httpCode = http.POST("{\"id\":\""+content.substring(0)+"\"}");
+  
+    // httpCode will be negative on error
+    if (httpCode > 0) {
+      // HTTP header has been send and Server response header has been handled
+      Serial.printf("[HTTP] POST... code: %d\n", httpCode);
+  
+      const String& payload = http.getString();
+      Serial.println("received payload:\n<<");
+      Serial.println(payload);
+      Serial.println(">>");
+      if (httpCode == HTTP_CODE_OK && payload.length()==14) {
+        blink(2, 500);
+      } else {
+        blink(5, 100);
+      }
+
+      
+    } else {
+      Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+  
+    http.end();
   }
 }
