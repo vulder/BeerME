@@ -9,7 +9,7 @@ services:
       PG.PASSWORD: $DB_PWD
       PG.HOST: db
       PG.PORT: 5432
-      PG.DBNAME: beerme
+      PG.DBNAME: postgres
       PG.POOL.MAX_SIZE: 4
     networks:
       - default
