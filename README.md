@@ -1,5 +1,7 @@
 # Hey you, [beer] me!
 
+<img src="img/BeerMEOverview.png" width="800"/>
+
 ## Layout
 ```
   ├── app
