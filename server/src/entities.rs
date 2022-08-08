@@ -34,13 +34,16 @@ impl fmt::Display for UserToken {
     }
 }
 
+/// Represent a registed user
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "users")]
 pub struct UserEntity {
+    /// Universally unique identifier for the user
     pub uuid: String,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
+    /// Registered RFID token
     pub token: String,
 }
 
@@ -76,11 +79,14 @@ impl fmt::Display for UserEntity {
     }
 }
 
+/// Represent a beer that was consumed by a specific user at a specific point in time.
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]
 pub struct BeerEntity {
     pub id: i64,
+    /// Point of time when the beer was consumed/bought
     pub time: chrono::NaiveDateTime,
+    /// Universally unique identifier for the user
     pub uuid: String,
     pub beer_brand: String,
     pub paid: bool,
@@ -120,12 +126,17 @@ impl fmt::Display for BeerEntity {
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]
 pub struct UserBeerCount {
+    /// Total amount of beers consumed
     pub total: i64,
+    /// Total amount of beers consumed in the last day
     pub today: i64,
+    /// Total amount of beers consumed in the last week
     pub week: i64,
+    /// Total amount of beers consumed in the last month
     pub month: i64,
 }
 
+/// Represent a specific beer brand, containing all relevant information about the brand.
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beer_brands")]
 pub struct BeerBrandEntity {

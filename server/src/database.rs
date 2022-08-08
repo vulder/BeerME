@@ -3,6 +3,7 @@ use crate::errors::MyError;
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;
 
+/// Retrieve all registered users from the database.
 pub async fn get_users(client: &Client) -> Result<Vec<UserEntity>, MyError> {
     let _stmt = include_str!("sql/get_users.sql");
     let _stmt = _stmt.replace("$table_fields", &UserEntity::sql_table_fields());
@@ -18,6 +19,7 @@ pub async fn get_users(client: &Client) -> Result<Vec<UserEntity>, MyError> {
     Ok(op_users)
 }
 
+/// Inserts an entry into the database for the new user.
 pub async fn create_user(client: &Client, user: &UserEntity) -> Result<UserEntity, MyError> {
     let _stmt = include_str!("sql/add_user.sql");
     let _stmt = _stmt.replace("$table_fields", &UserEntity::sql_table_fields());
@@ -42,6 +44,7 @@ pub async fn create_user(client: &Client, user: &UserEntity) -> Result<UserEntit
         .ok_or(MyError::NotFound)
 }
 
+/// Deletes and existing user from the database.
 pub async fn delete_user(client: &Client, user: &UserEntity) -> Result<bool, MyError> {
     let _stmt = include_str!("sql/delete_user.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
@@ -55,6 +58,7 @@ pub async fn delete_user(client: &Client, user: &UserEntity) -> Result<bool, MyE
         .ok_or(MyError::NotFound)
 }
 
+/// Registeres a taken/consumed beer into the database.
 pub async fn register_taken_beer(
     client: &Client,
     beer_entry: BeerEntity,
@@ -80,6 +84,7 @@ pub async fn register_taken_beer(
         .ok_or(MyError::NotFound)
 }
 
+/// Deletes an beer entry from the database.
 pub async fn delete_beer(client: &Client, beer: BeerEntity) -> Result<bool, MyError> {
     let _stmt = include_str!("sql/delete_beer.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
@@ -93,6 +98,7 @@ pub async fn delete_beer(client: &Client, beer: BeerEntity) -> Result<bool, MyEr
         .ok_or(MyError::NotFound)
 }
 
+/// Retrieves the last beer that was consumed by the user.
 pub async fn get_last_beer_of_user(client: &Client, user: &UserEntity) -> Result<BeerEntity, MyError> {
     let _stmt = include_str!("sql/get_last_beer_of_user.sql");
     let _stmt = _stmt.replace("$table_fields", &BeerEntity::sql_table_fields());
@@ -107,6 +113,7 @@ pub async fn get_last_beer_of_user(client: &Client, user: &UserEntity) -> Result
         .ok_or(MyError::NotFound)
 }
 
+/// Retrieves all beer entries that are associated with the provided user.
 pub async fn beer_entries_for_user(
     client: &Client,
     user: &UserEntity,
@@ -126,6 +133,7 @@ pub async fn beer_entries_for_user(
     Ok(op_users)
 }
 
+/// Computes beer consumption statistics for the given user.
 pub async fn beer_summary_values_for_user(
     client: &Client,
     user: &UserEntity,
@@ -143,6 +151,7 @@ pub async fn beer_summary_values_for_user(
         .ok_or(MyError::NotFound)
 }
 
+/// Computes the given users favorite beer brand.
 pub async fn favorite_beer_for_user(client: &Client, user: &UserEntity) -> Result<String, MyError> {
     let _stmt = include_str!("sql/favorit_beer.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
@@ -156,6 +165,7 @@ pub async fn favorite_beer_for_user(client: &Client, user: &UserEntity) -> Resul
         .ok_or(MyError::NotFound)
 }
 
+/// Retrieves all registed beer brands.
 pub async fn beer_brands(client: &Client) -> Result<Vec<BeerBrandEntity>, MyError> {
     let _stmt = include_str!("sql/beer_brands.sql");
     let _stmt = _stmt.replace("$table_fields", &BeerBrandEntity::sql_table_fields());
