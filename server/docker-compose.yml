@@ -1,0 +1,42 @@
+version: '3'
+services:
+  server:
+    build: .
+    environment:
+      SERVER_ADDR: 0.0.0.0
+      SERVER_PORT: 80
+      PG.USER: postgres
+      PG.PASSWORD: $DB_PWD
+      PG.HOST: db
+      PG.PORT: 5432
+      PG.DBNAME: postgres
+      PG.POOL.MAX_SIZE: 4
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.docker.network: traefik_default
+      traefik.enable: true
+      traefik.http.routers.beerme.entrypoints: websecure
+      traefik.http.routers.beerme.rule: "Host(`${BASE_URL}`)"
+      traefik.http.routers.beerme.tls: true
+      traefik.http.routers.beerme.tls.certresolver: le
+      traefik.http.services.beerme.loadbalancer.server.port: '80'
+
+  db:
+    image: postgres:14
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: $DB_PWD
+    volumes:
+      - ./db:/var/lib/postgresql/data
+      - .docker/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh:ro
+    networks:
+      - default
+
+networks:
+  default:
+  traefik:
+    external:
+      name: traefik_default
+
