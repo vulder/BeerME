@@ -22,9 +22,11 @@ pub async fn register_taken_beer(client: &Client, user_token: &UserToken) -> boo
         Some(user) => database::register_taken_beer(
             client,
             BeerEntry::new(
+                0, // dummy id
                 user.uuid.clone(),
                 chrono::Local::now().naive_local(),
                 "ByNFlowsMom".to_string(),
+                false,
             ),
         )
         .await

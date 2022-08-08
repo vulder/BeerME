@@ -61,10 +61,16 @@ pub async fn register_taken_beer(
 ) -> Result<BeerEntry, MyError> {
     let _stmt = include_str!("sql/register_beer_taken.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
+
     client
         .query(
             &stmt,
-            &[&beer_entry.time, &beer_entry.uuid, &beer_entry.beer_brand],
+            &[
+                &beer_entry.time,
+                &beer_entry.uuid,
+                &beer_entry.beer_brand,
+                &beer_entry.paid,
+            ],
         )
         .await?
         .iter()
