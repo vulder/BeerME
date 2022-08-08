@@ -9,7 +9,7 @@ mod tests {
     use actix_web::{http::StatusCode, test, web, App};
     use beer_core::{
         dtos::{BeerSummary, CreateUserRequest},
-        entities::{BeerBrandEntry, User},
+        entities::{BeerBrandEntity, UserEntity},
         user_service,
     };
     use tokio_postgres::NoTls;
@@ -36,7 +36,7 @@ mod tests {
             .await;
 
         assert!(req.status().is_success(), "Failed to create user");
-        let user: User = test::read_body_json(req).await;
+        let user: UserEntity = test::read_body_json(req).await;
         assert_eq!("NewFirst", user.first_name, "Missmatch of first_name");
         assert_eq!("UserLast", user.last_name, "Missmatch of last_name");
         assert_eq!("new@user.com", user.email, "Missmatch of email");
@@ -120,7 +120,7 @@ mod tests {
             .await;
 
         assert!(req.status().is_success(), "Failed to request user");
-        let user: User = test::read_body_json(req).await;
+        let user: UserEntity = test::read_body_json(req).await;
         assert_eq!(
             "aa981764-76f7-4098-9cc6-525473dec7aa", user.uuid,
             "Missmatch of uuid"
@@ -199,7 +199,7 @@ mod tests {
             .await;
 
         assert!(req.status().is_success(), "Failed to request beer brands");
-        let brands: Vec<BeerBrandEntry> = test::read_body_json(req).await;
+        let brands: Vec<BeerBrandEntity> = test::read_body_json(req).await;
 
         let maybe_unknown = brands
             .iter()

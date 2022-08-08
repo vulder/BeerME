@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::entities::{BeerEntry, User, UserToken};
+use crate::entities::{BeerEntity, UserEntity, UserToken};
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -32,14 +32,14 @@ pub struct CreateUserRequest {
 }
 
 impl CreateUserRequest {
-    pub fn to_user(&self) -> Option<User> {
+    pub fn to_user(&self) -> Option<UserEntity> {
         if let (Some(first_name), Some(last_name), Some(email), Some(token)) = (
             self.first_name.as_ref(),
             self.last_name.as_ref(),
             self.email.as_ref(),
             self.token.as_ref(),
         ) {
-            Some(User::new(
+            Some(UserEntity::new(
                 Uuid::new_v4(),
                 first_name.to_string(),
                 last_name.to_string(),
@@ -74,7 +74,7 @@ pub struct BeerSummary {
     pub month: i64,
     pub total: i64,
     pub unpaid: i8,
-    pub recent_beers: Vec<BeerEntry>,
+    pub recent_beers: Vec<BeerEntity>,
     pub favorite_beer: String,
 }
 
@@ -85,7 +85,7 @@ impl BeerSummary {
         month: i64,
         total: i64,
         unpaid: i8,
-        recent_beers: Vec<BeerEntry>,
+        recent_beers: Vec<BeerEntity>,
         favorite_beer: String,
     ) -> Self {
         Self {

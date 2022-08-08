@@ -36,7 +36,7 @@ impl fmt::Display for UserToken {
 
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "users")]
-pub struct User {
+pub struct UserEntity {
     pub uuid: String,
     pub first_name: String,
     pub last_name: String,
@@ -44,7 +44,7 @@ pub struct User {
     pub token: String,
 }
 
-impl User {
+impl UserEntity {
     pub fn new(
         uuid: Uuid,
         first_name: String,
@@ -66,7 +66,7 @@ impl User {
     }
 }
 
-impl fmt::Display for User {
+impl fmt::Display for UserEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
@@ -78,7 +78,7 @@ impl fmt::Display for User {
 
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]
-pub struct BeerEntry {
+pub struct BeerEntity {
     pub id: i64,
     pub time: chrono::NaiveDateTime,
     pub uuid: String,
@@ -86,7 +86,7 @@ pub struct BeerEntry {
     pub paid: bool,
 }
 
-impl BeerEntry {
+impl BeerEntity {
     pub fn new(
         id: i64,
         uuid: String,
@@ -104,11 +104,11 @@ impl BeerEntry {
     }
 }
 
-impl fmt::Display for BeerEntry {
+impl fmt::Display for BeerEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "BeerEntry{{ id: {}, uuid: {}, time: {}, bier_brand: {} }}",
+            "BeerEntity{{ id: {}, uuid: {}, time: {}, bier_brand: {} }}",
             self.id,
             self.uuid,
             self.time.format("%Y-%m-%d %H:%M:%S").to_string(),
@@ -128,16 +128,16 @@ pub struct UserBeerCount {
 
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beer_brands")]
-pub struct BeerBrandEntry {
+pub struct BeerBrandEntity {
     pub beer_brand: String,
     pub beer_type: String,
 }
 
-impl fmt::Display for BeerBrandEntry {
+impl fmt::Display for BeerBrandEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "BeerBrandEntry{{ beer_brand: {}, beer_type: {} }}",
+            "BeerBrandEntity{{ beer_brand: {}, beer_type: {} }}",
             self.beer_brand, self.beer_type,
         )
     }
