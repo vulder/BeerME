@@ -16,8 +16,10 @@ CREATE TABLE beer_user.beer_brands (
 );
 
 CREATE TABLE beer_user.beers (
+    id              BIGSERIAL PRIMARY KEY,
     time            timestamp,
     uuid            VARCHAR(36) NOT NULL,
     brand_id        BIGSERIAL,
+    paid            BOOLEAN,
     FOREIGN KEY (brand_id) REFERENCES beer_user.beer_brands(brand_id)
 );

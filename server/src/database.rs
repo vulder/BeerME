@@ -1,26 +1,28 @@
-use crate::entities::{BeerBrandEntry, BeerEntry, User, UserBeerCount};
+use crate::entities::{BeerBrandEntity, BeerEntity, UserEntity, UserBeerCount};
 use crate::errors::MyError;
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;
 
-pub async fn get_users(client: &Client) -> Result<Vec<User>, MyError> {
+/// Retrieve all registered users from the database.
+pub async fn get_users(client: &Client) -> Result<Vec<UserEntity>, MyError> {
     let _stmt = include_str!("sql/get_users.sql");
-    let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
+    let _stmt = _stmt.replace("$table_fields", &UserEntity::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     let op_users = client
         .query(&stmt, &[])
         .await?
         .iter()
-        .map(|row| User::from_row_ref(row).unwrap())
-        .collect::<Vec<User>>();
+        .map(|row| UserEntity::from_row_ref(row).unwrap())
+        .collect::<Vec<UserEntity>>();
 
     Ok(op_users)
 }
 
-pub async fn create_user(client: &Client, user: &User) -> Result<User, MyError> {
+/// Inserts an entry into the database for the new user.
+pub async fn create_user(client: &Client, user: &UserEntity) -> Result<UserEntity, MyError> {
     let _stmt = include_str!("sql/add_user.sql");
-    let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
+    let _stmt = _stmt.replace("$table_fields", &UserEntity::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     client
@@ -36,13 +38,14 @@ pub async fn create_user(client: &Client, user: &User) -> Result<User, MyError> 
         )
         .await?
         .iter()
-        .map(|row| User::from_row_ref(row).unwrap())
-        .collect::<Vec<User>>()
+        .map(|row| UserEntity::from_row_ref(row).unwrap())
+        .collect::<Vec<UserEntity>>()
         .pop()
         .ok_or(MyError::NotFound)
 }
 
-pub async fn delete_user(client: &Client, user: &User) -> Result<bool, MyError> {
+/// Deletes and existing user from the database.
+pub async fn delete_user(client: &Client, user: &UserEntity) -> Result<bool, MyError> {
     let _stmt = include_str!("sql/delete_user.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
@@ -55,26 +58,34 @@ pub async fn delete_user(client: &Client, user: &User) -> Result<bool, MyError> 
         .ok_or(MyError::NotFound)
 }
 
+/// Registeres a taken/consumed beer into the database.
 pub async fn register_taken_beer(
     client: &Client,
-    beer_entry: BeerEntry,
-) -> Result<BeerEntry, MyError> {
+    beer_entry: BeerEntity,
+) -> Result<BeerEntity, MyError> {
     let _stmt = include_str!("sql/register_beer_taken.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
+
     client
         .query(
             &stmt,
-            &[&beer_entry.time, &beer_entry.uuid, &beer_entry.beer_brand],
+            &[
+                &beer_entry.time,
+                &beer_entry.uuid,
+                &beer_entry.beer_brand,
+                &beer_entry.paid,
+            ],
         )
         .await?
         .iter()
-        .map(|row| BeerEntry::from_row_ref(row).unwrap())
-        .collect::<Vec<BeerEntry>>()
+        .map(|row| BeerEntity::from_row_ref(row).unwrap())
+        .collect::<Vec<BeerEntity>>()
         .pop()
         .ok_or(MyError::NotFound)
 }
 
-pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyError> {
+/// Deletes an beer entry from the database.
+pub async fn delete_beer(client: &Client, beer: BeerEntity) -> Result<bool, MyError> {
     let _stmt = include_str!("sql/delete_beer.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
@@ -87,9 +98,10 @@ pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyErr
         .ok_or(MyError::NotFound)
 }
 
-pub async fn get_last_beer_of_user(client: &Client, user: &User) -> Result<BeerEntry, MyError> {
+/// Retrieves the last beer that was consumed by the user.
+pub async fn get_last_beer_of_user(client: &Client, user: &UserEntity) -> Result<BeerEntity, MyError> {
     let _stmt = include_str!("sql/get_last_beer_of_user.sql");
-    let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let _stmt = _stmt.replace("$table_fields", &BeerEntity::sql_table_fields());
     let _stmt = _stmt.replace("beers.beer_brand", "beer_brands.beer_brand");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
@@ -97,16 +109,17 @@ pub async fn get_last_beer_of_user(client: &Client, user: &User) -> Result<BeerE
         .query(&stmt, &[&user.uuid])
         .await?
         .pop()
-        .map(|row| BeerEntry::from_row_ref(&row).unwrap())
+        .map(|row| BeerEntity::from_row_ref(&row).unwrap())
         .ok_or(MyError::NotFound)
 }
 
+/// Retrieves all beer entries that are associated with the provided user.
 pub async fn beer_entries_for_user(
     client: &Client,
-    user: &User,
-) -> Result<Vec<BeerEntry>, MyError> {
+    user: &UserEntity,
+) -> Result<Vec<BeerEntity>, MyError> {
     let _stmt = include_str!("sql/get_beer_entries_for_user.sql");
-    let _stmt = _stmt.replace("$table_fields", &BeerEntry::sql_table_fields());
+    let _stmt = _stmt.replace("$table_fields", &BeerEntity::sql_table_fields());
     let _stmt = _stmt.replace("beers.beer_brand", "beer_brands.beer_brand");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
@@ -114,15 +127,16 @@ pub async fn beer_entries_for_user(
         .query(&stmt, &[&user.uuid])
         .await?
         .iter()
-        .map(|row| BeerEntry::from_row_ref(row).unwrap())
-        .collect::<Vec<BeerEntry>>();
+        .map(|row| BeerEntity::from_row_ref(row).unwrap())
+        .collect::<Vec<BeerEntity>>();
 
     Ok(op_users)
 }
 
+/// Computes beer consumption statistics for the given user.
 pub async fn beer_summary_values_for_user(
     client: &Client,
-    user: &User,
+    user: &UserEntity,
 ) -> Result<UserBeerCount, MyError> {
     let _stmt = include_str!("sql/get_beer_user_summary.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
@@ -137,7 +151,8 @@ pub async fn beer_summary_values_for_user(
         .ok_or(MyError::NotFound)
 }
 
-pub async fn favorite_beer_for_user(client: &Client, user: &User) -> Result<String, MyError> {
+/// Computes the given users favorite beer brand.
+pub async fn favorite_beer_for_user(client: &Client, user: &UserEntity) -> Result<String, MyError> {
     let _stmt = include_str!("sql/favorit_beer.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
 
@@ -150,15 +165,16 @@ pub async fn favorite_beer_for_user(client: &Client, user: &User) -> Result<Stri
         .ok_or(MyError::NotFound)
 }
 
-pub async fn beer_brands(client: &Client) -> Result<Vec<BeerBrandEntry>, MyError> {
+/// Retrieves all registed beer brands.
+pub async fn beer_brands(client: &Client) -> Result<Vec<BeerBrandEntity>, MyError> {
     let _stmt = include_str!("sql/beer_brands.sql");
-    let _stmt = _stmt.replace("$table_fields", &BeerBrandEntry::sql_table_fields());
+    let _stmt = _stmt.replace("$table_fields", &BeerBrandEntity::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
     Ok(client
         .query(&stmt, &[])
         .await?
         .iter()
-        .map(|row| BeerBrandEntry::from_row_ref(row).unwrap())
-        .collect::<Vec<BeerBrandEntry>>())
+        .map(|row| BeerBrandEntity::from_row_ref(row).unwrap())
+        .collect::<Vec<BeerBrandEntity>>())
 }

@@ -34,17 +34,20 @@ impl fmt::Display for UserToken {
     }
 }
 
+/// Represent a registed user
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "users")]
-pub struct User {
+pub struct UserEntity {
+    /// Universally unique identifier for the user
     pub uuid: String,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
+    /// Registered RFID token
     pub token: String,
 }
 
-impl User {
+impl UserEntity {
     pub fn new(
         uuid: Uuid,
         first_name: String,
@@ -66,7 +69,7 @@ impl User {
     }
 }
 
-impl fmt::Display for User {
+impl fmt::Display for UserEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
@@ -76,29 +79,43 @@ impl fmt::Display for User {
     }
 }
 
+/// Represent a beer that was consumed by a specific user at a specific point in time.
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]
-pub struct BeerEntry {
-    pub uuid: String,
+pub struct BeerEntity {
+    pub id: i64,
+    /// Point of time when the beer was consumed/bought
     pub time: chrono::NaiveDateTime,
+    /// Universally unique identifier for the user
+    pub uuid: String,
     pub beer_brand: String,
+    pub paid: bool,
 }
 
-impl BeerEntry {
-    pub fn new(uuid: String, time: chrono::NaiveDateTime, beer_brand: String) -> Self {
+impl BeerEntity {
+    pub fn new(
+        id: i64,
+        uuid: String,
+        time: chrono::NaiveDateTime,
+        beer_brand: String,
+        paid: bool,
+    ) -> Self {
         Self {
+            id,
             uuid,
             time,
             beer_brand,
+            paid,
         }
     }
 }
 
-impl fmt::Display for BeerEntry {
+impl fmt::Display for BeerEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "BeerEntry{{ uuid: {}, time: {}, bier_brand: {} }}",
+            "BeerEntity{{ id: {}, uuid: {}, time: {}, bier_brand: {} }}",
+            self.id,
             self.uuid,
             self.time.format("%Y-%m-%d %H:%M:%S").to_string(),
             self.beer_brand
@@ -109,24 +126,29 @@ impl fmt::Display for BeerEntry {
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beers")]
 pub struct UserBeerCount {
+    /// Total amount of beers consumed
     pub total: i64,
+    /// Total amount of beers consumed in the last day
     pub today: i64,
+    /// Total amount of beers consumed in the last week
     pub week: i64,
+    /// Total amount of beers consumed in the last month
     pub month: i64,
 }
 
+/// Represent a specific beer brand, containing all relevant information about the brand.
 #[derive(Deserialize, PostgresMapper, Serialize, Debug, Clone)]
 #[pg_mapper(table = "beer_brands")]
-pub struct BeerBrandEntry {
+pub struct BeerBrandEntity {
     pub beer_brand: String,
     pub beer_type: String,
 }
 
-impl fmt::Display for BeerBrandEntry {
+impl fmt::Display for BeerBrandEntity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             f,
-            "BeerBrandEntry{{ beer_brand: {}, beer_type: {} }}",
+            "BeerBrandEntity{{ beer_brand: {}, beer_type: {} }}",
             self.beer_brand, self.beer_type,
         )
     }

@@ -1,5 +1,5 @@
 use crate::dtos::BeerSummary;
-use crate::entities::{BeerBrandEntry, BeerEntry, User, UserToken};
+use crate::entities::{BeerBrandEntity, BeerEntity, UserEntity, UserToken};
 use crate::user_service;
 use deadpool_postgres::Client;
 
@@ -21,10 +21,12 @@ pub async fn register_taken_beer(client: &Client, user_token: &UserToken) -> boo
     match &maybe_user {
         Some(user) => database::register_taken_beer(
             client,
-            BeerEntry::new(
+            BeerEntity::new(
+                0, // dummy id
                 user.uuid.clone(),
                 chrono::Local::now().naive_local(),
                 "ByNFlowsMom".to_string(),
+                false,
             ),
         )
         .await
@@ -33,30 +35,30 @@ pub async fn register_taken_beer(client: &Client, user_token: &UserToken) -> boo
     }
 }
 
-pub async fn delete_beer(client: &Client, beer: BeerEntry) -> bool {
+pub async fn delete_beer(client: &Client, beer: BeerEntity) -> bool {
     database::delete_beer(client, beer).await.unwrap()
 }
 
-pub async fn delete_last_beer_of_user(client: &Client, user: &User) -> bool {
+pub async fn delete_last_beer_of_user(client: &Client, user: &UserEntity) -> bool {
     let last_beer = get_last_beer_of_user(client, user).await;
     delete_beer(client, last_beer).await
 }
 
-pub async fn get_last_beer_of_user(client: &Client, user: &User) -> BeerEntry {
+pub async fn get_last_beer_of_user(client: &Client, user: &UserEntity) -> BeerEntity {
     database::get_last_beer_of_user(client, user).await.unwrap()
 }
 
-pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary {
+pub async fn calculate_beer_summary(client: &Client, user: &UserEntity) -> BeerSummary {
     let user_beer_entries = database::beer_entries_for_user(client, user).await;
 
     let count = database::beer_summary_values_for_user(client, user)
         .await
         .unwrap();
-    let recent_beers: Vec<BeerEntry> = user_beer_entries
+    let recent_beers: Vec<BeerEntity> = user_beer_entries
         .unwrap()
         .into_iter()
         .take(10)
-        .collect::<Vec<BeerEntry>>();
+        .collect::<Vec<BeerEntity>>();
     let fav_beer = database::favorite_beer_for_user(client, user)
         .await
         .unwrap();
@@ -73,6 +75,6 @@ pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary
     )
 }
 
-pub async fn beer_brands(client: &Client) -> Vec<BeerBrandEntry> {
+pub async fn beer_brands(client: &Client) -> Vec<BeerBrandEntity> {
     database::beer_brands(client).await.unwrap()
 }

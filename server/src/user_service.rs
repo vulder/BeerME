@@ -1,9 +1,9 @@
 use deadpool_postgres::Client;
 
 use crate::database;
-use crate::entities::{User, UserToken};
+use crate::entities::{UserEntity, UserToken};
 
-pub async fn create_user(client: &Client, user: &User) -> Option<User> {
+pub async fn create_user(client: &Client, user: &UserEntity) -> Option<UserEntity> {
     let maybe_user = database::create_user(client, user).await;
     match maybe_user {
         Ok(user) => Some(user),
@@ -14,11 +14,11 @@ pub async fn create_user(client: &Client, user: &User) -> Option<User> {
     }
 }
 
-pub async fn delete_user(client: &Client, user: &User) -> bool {
+pub async fn delete_user(client: &Client, user: &UserEntity) -> bool {
     database::delete_user(client, user).await.unwrap()
 }
 
-pub async fn get_user(client: &Client, user_token: &UserToken) -> Option<User> {
+pub async fn get_user(client: &Client, user_token: &UserToken) -> Option<UserEntity> {
     database::get_users(client)
         .await
         .unwrap()
@@ -27,7 +27,7 @@ pub async fn get_user(client: &Client, user_token: &UserToken) -> Option<User> {
         .cloned()
 }
 
-pub async fn get_user_from_uuid(client: &Client, uuid: String) -> Option<User> {
+pub async fn get_user_from_uuid(client: &Client, uuid: String) -> Option<UserEntity> {
     database::get_users(client)
         .await
         .unwrap()
