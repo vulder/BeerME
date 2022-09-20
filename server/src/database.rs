@@ -61,10 +61,16 @@ pub async fn register_taken_beer(
 ) -> Result<BeerEntry, MyError> {
     let _stmt = include_str!("sql/register_beer_taken.sql");
     let stmt = client.prepare(&_stmt).await.unwrap();
+
     client
         .query(
             &stmt,
-            &[&beer_entry.time, &beer_entry.uuid, &beer_entry.beer_brand],
+            &[
+                &beer_entry.time,
+                &beer_entry.uuid,
+                &beer_entry.beer_brand,
+                &beer_entry.paid,
+            ],
         )
         .await?
         .iter()
@@ -72,6 +78,30 @@ pub async fn register_taken_beer(
         .collect::<Vec<BeerEntry>>()
         .pop()
         .ok_or(MyError::NotFound)
+}
+
+/// Markes all beers of a user as paid.
+pub async fn mark_beers_payed_of_user(client: &Client, user: &User) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/mark_beers_paid.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid])
+        .await
+        .map(|_| true)
+        .map_err(|err| MyError::PGError(err))
+}
+
+/// Markes specified beer as paid.
+pub async fn mark_beer_paid(client: &Client, user: &User, beer_id: i64) -> Result<bool, MyError> {
+    let _stmt = include_str!("sql/mark_beer_paid.sql");
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client
+        .query(&stmt, &[&user.uuid, &beer_id])
+        .await
+        .map(|_| true)
+        .map_err(|err| MyError::PGError(err))
 }
 
 pub async fn delete_beer(client: &Client, beer: BeerEntry) -> Result<bool, MyError> {

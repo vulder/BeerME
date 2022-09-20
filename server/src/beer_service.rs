@@ -22,9 +22,11 @@ pub async fn register_taken_beer(client: &Client, user_token: &UserToken) -> boo
         Some(user) => database::register_taken_beer(
             client,
             BeerEntry::new(
+                0, // dummy id
                 user.uuid.clone(),
                 chrono::Local::now().naive_local(),
-                "ByNFlowsMom".to_string(),
+                "Unknown".to_string(),
+                false,
             ),
         )
         .await
@@ -44,6 +46,20 @@ pub async fn delete_last_beer_of_user(client: &Client, user: &User) -> bool {
 
 pub async fn get_last_beer_of_user(client: &Client, user: &User) -> BeerEntry {
     database::get_last_beer_of_user(client, user).await.unwrap()
+}
+
+/// Markes all beers of a user as paid.
+pub async fn mark_all_beers_payed(client: &Client, user: &User) -> bool {
+    database::mark_beers_payed_of_user(client, user)
+        .await
+        .unwrap()
+}
+
+/// Marks a beer as paid.
+pub async fn mark_beer_paid(client: &Client, user: &User, beer_id: i64) -> bool {
+    database::mark_beer_paid(client, user, beer_id)
+        .await
+        .unwrap()
 }
 
 pub async fn calculate_beer_summary(client: &Client, user: &User) -> BeerSummary {
